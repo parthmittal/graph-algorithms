@@ -5,6 +5,4 @@
 
 /* headers from ./include */
 
-int main()
-{
-}
+int main() {}

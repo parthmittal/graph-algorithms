@@ -1,7 +1,7 @@
-#include <vector>
+#include <algorithm>
 #include <map>
 #include <utility>
-#include <algorithm>
+#include <vector>
 
 #include <cassert>
 
@@ -10,14 +10,13 @@
 
 namespace our {
 
-template<typename edge_t>
+template <typename edge_t>
 struct crs_row_t {
-    const std::vector< edge_t > &crs;
+    const std::vector<edge_t> &crs;
     int si, ei;
 
-    crs_row_t(const std::vector< edge_t > &crs, int si, int ei)
-        : crs(crs), si(si), ei(ei)
-    {
+    crs_row_t(const std::vector<edge_t> &crs, int si, int ei)
+        : crs(crs), si(si), ei(ei) {
 #ifdef DEBUG
         assert(0 <= si);
         assert(si <= ei);
@@ -25,7 +24,7 @@ struct crs_row_t {
 #endif
     }
 
-    using iterator_t = typename std::vector< edge_t >::iterator;
+    using iterator_t = typename std::vector<edge_t>::iterator;
 
     iterator_t begin() { return std::advance(crs.begin(), si); }
 
@@ -33,8 +32,7 @@ struct crs_row_t {
 
     int size() { return std::distance(begin(), end()); }
 
-    edge_t operator[](int idx)
-    {
+    edge_t operator[](int idx) {
 #ifdef DEBUG
         assert(idx < size());
 #endif
@@ -42,15 +40,14 @@ struct crs_row_t {
     }
 };
 
-template<typename edge_t>
+template <typename edge_t>
 struct graph_t {
     int N; /* number of vertices */
-    std::vector< edge_t > crs;
-    std::vector< int > si, ei;
+    std::vector<edge_t> crs;
+    std::vector<int> si, ei;
 
-    graph_t (const std::vector< std::vector<edge_t> > &adj)
-        : N(adj.size()), si(adj.size()), ei(adj.size())
-    {
+    graph_t(const std::vector<std::vector<edge_t> > &adj)
+        : N(adj.size()), si(adj.size()), ei(adj.size()) {
         for (int u = 0; u < N; ++u) {
             si[u] = crs.size();
             crs.insert(crs.end(), adj[u].begin(), adj[u].end());
@@ -58,8 +55,7 @@ struct graph_t {
         }
     }
 
-    crs_row_t< edge_t > operator[](int u)
-    {
+    crs_row_t<edge_t> operator[](int u) {
 #ifdef DEBUG
         assert(0 <= u && u < N);
 #endif
@@ -67,6 +63,6 @@ struct graph_t {
     }
 };
 
-}
+}  // namespace our
 
 #endif
