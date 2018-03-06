@@ -10,8 +10,7 @@
 
 namespace our {
 
-template <typename edge_t>
-struct crs_row_t {
+template <typename edge_t> struct crs_row_t {
     const std::vector<edge_t> &crs;
     int si, ei;
 
@@ -40,13 +39,12 @@ struct crs_row_t {
     }
 };
 
-template <typename edge_t>
-struct graph_t {
+template <typename edge_t> struct graph_t {
     int N; /* number of vertices */
     std::vector<edge_t> crs;
     std::vector<int> si, ei;
 
-    graph_t(const std::vector<std::vector<edge_t> > &adj)
+    graph_t(const std::vector<std::vector<edge_t>> &adj)
         : N(adj.size()), si(adj.size()), ei(adj.size()) {
         for (int u = 0; u < N; ++u) {
             si[u] = crs.size();
@@ -63,6 +61,6 @@ struct graph_t {
     }
 };
 
-}  // namespace our
+} // namespace our
 
 #endif
