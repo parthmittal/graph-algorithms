@@ -31,11 +31,11 @@ template <typename edge_t> struct crs_row_t {
 
     int size() { return std::distance(begin(), end()); }
 
-    edge_t operator[](int idx) {
+    const edge_t operator[](int idx) {
 #ifdef DEBUG
         assert(idx < size());
 #endif
-        return (begin() + idx);
+        return *(begin() + idx);
     }
 };
 
