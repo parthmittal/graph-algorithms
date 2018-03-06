@@ -23,11 +23,11 @@ template <typename edge_t> struct crs_row_t {
 #endif
     }
 
-    using iterator_t = typename std::vector<edge_t>::iterator;
+    using iterator_t = typename std::vector<edge_t>::const_iterator;
 
-    iterator_t begin() { return std::advance(crs.begin(), si); }
+    iterator_t begin() { return (crs.begin() + si); }
 
-    iterator_t end() { return std::advance(crs.begin(), ei); }
+    iterator_t end() { return (crs.begin() + ei); }
 
     int size() { return std::distance(begin(), end()); }
 
@@ -35,7 +35,7 @@ template <typename edge_t> struct crs_row_t {
 #ifdef DEBUG
         assert(idx < size());
 #endif
-        return *std::advance(begin(), idx);
+        return (begin() + idx);
     }
 };
 
@@ -53,7 +53,7 @@ template <typename edge_t> struct graph_t {
         }
     }
 
-    crs_row_t<edge_t> operator[](int u) {
+    crs_row_t<edge_t> operator[](int u) const {
 #ifdef DEBUG
         assert(0 <= u && u < N);
 #endif
