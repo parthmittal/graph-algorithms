@@ -21,18 +21,18 @@ class OptParser {
      * format
      * is_short = 1 if the supplied option is the shortname, and zero otherwise
      */
-    bool checkOption(const std::string option, int is_short = 1);
+    bool checkOption(const std::string &option, int is_short = 1);
 
     /*
      * function to strip the option of the initial hyphens
      * is_short = 1 if the supplied option is the shortname, and zero otherwise
      */
-    std::string stripOptionName(const std::string option, int is_short = 1);
+    std::string stripOptionName(const std::string &option, int is_short = 1);
 
     /*
-         * function to add option to list of options
-         */
-    void addToOptList(std::string option_shortname);
+     * function to add option to list of options
+     */
+    void addToOptList(const std::string &option_shortname);
 
   public:
     /*
@@ -40,9 +40,9 @@ class OptParser {
      * option to the short name (if provided)
      * returns the index of the added option in the list of options
      */
-    void addOption(const std::string option_shortname);
-    void addOption(const std::string option_shortname,
-                   const std::string option_name);
+    void addOption(const std::string &option_shortname);
+    void addOption(const std::string &option_shortname,
+                   const std::string &option_name);
 
     /*
      * function to parse the command line arguments, marking the valid options
@@ -58,7 +58,7 @@ class OptParser {
      *       0, if option not found in command line arguments
      *      -1, if option not added to the parser
      */
-    int checkIncluded(std::string option);
+    int checkIncluded(const std::string &option);
 };
 
 } // namespace our

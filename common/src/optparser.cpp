@@ -5,7 +5,7 @@
 
 namespace our {
 
-bool OptParser::checkOption(const std::string option, int is_short) {
+bool OptParser::checkOption(const std::string &option, int is_short) {
     int n = option.length();
     if (is_short) { /* if shortname is provided */
         if (n <= 1)
@@ -23,14 +23,14 @@ bool OptParser::checkOption(const std::string option, int is_short) {
     return true;
 }
 
-std::string OptParser::stripOptionName(const std::string option, int is_short) {
+std::string OptParser::stripOptionName(const std::string &option, int is_short) {
     if (is_short)
         return std::string(1, option[1]);
     else
         return option.substr(2);
 }
 
-void OptParser::addToOptList(const std::string option_shortname) {
+void OptParser::addToOptList(const std::string &option_shortname) {
     auto iter = list_of_options_short.find(option_shortname);
     if (iter == list_of_options_short.end()) {
         number_of_options += 1;
@@ -38,7 +38,7 @@ void OptParser::addToOptList(const std::string option_shortname) {
     }
 }
 
-void OptParser::addOption(const std::string option_shortname) {
+void OptParser::addOption(const std::string &option_shortname) {
     if (checkOption(option_shortname))
         addToOptList(stripOptionName(option_shortname));
     else
@@ -46,8 +46,8 @@ void OptParser::addOption(const std::string option_shortname) {
                   << " cannot be added as it is not of a valid format.\n";
 }
 
-void OptParser::addOption(const std::string option_shortname,
-                          const std::string option_name) {
+void OptParser::addOption(const std::string &option_shortname,
+                          const std::string &option_name) {
     if (checkOption(option_shortname) && checkOption(option_name, 0)) {
         addToOptList(stripOptionName(option_shortname));
         name_to_shortname[stripOptionName(option_name)] =
@@ -86,7 +86,7 @@ void OptParser::parse(int argc, const char **argv) {
     }
 }
 
-int OptParser::checkIncluded(std::string option) {
+int OptParser::checkIncluded(const std::string &option) {
     int n = option.length();
     if (n == 1) {
         if (list_of_options_short.find(option) == list_of_options_short.end()) {
