@@ -60,7 +60,7 @@ void OptParser::addOption(const std::string &option_shortname,
 
 void OptParser::parse(int argc, const char **argv) {
     for (int i = 0; i < argc; i++) {
-        std::string current_option(current_option);
+        std::string current_option(argv[i]);
         std::string shortname;
         if (checkOption(current_option)) {
             shortname = stripOptionName(current_option);
