@@ -3,6 +3,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <iostream>
 
 #include <compress.hpp>
 #include <graph.hpp>
@@ -41,7 +42,10 @@ naive_graph_t<int> read_file(std::string filename, OptParser parser) {
             if (!parser.checkIncluded("is_directed"))
                 adj[key[e.second]].push_back(key[e.first]);
         }
-        return {adj, vertex_count, edge_count};
+        return {adj, vertex_count};
+    }
+    else {
+        cerr << "File does not open. Check filename provided.\n";
     }
 }
 } // namespace our
