@@ -10,6 +10,18 @@
 
 namespace our {
 
+template <typename edge_t> struct naive_graph_t {
+    std::vector<std::vector<edge_t>> adj;
+    int vertex_count;
+    int edge_count;
+
+    naive_graph_t(const std::vector<std::vector<edge_t>> &adj, int vertex_cnt,
+                  int edge_cnt)
+        : adj(adj), edge_count(edge_cnt), vertex_count(vertex_cnt) {}
+
+    naive_graph_t() : edge_count(0), vertex_count(0) {}
+};
+
 template <typename edge_t> struct crs_row_t {
     const std::vector<edge_t> &crs;
     int si, ei;
