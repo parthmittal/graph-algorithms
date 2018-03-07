@@ -14,8 +14,6 @@ class OptParser {
     std::map<std::string, std::string> name_to_shortname;
     int number_of_options;
 
-    OptParser() : number_of_options(0) {}
-
     /*
      * function to check whether the supplied string is in the correct option
      * format
@@ -40,6 +38,8 @@ class OptParser {
      * option to the short name (if provided)
      * returns the index of the added option in the list of options
      */
+    OptParser() : number_of_options(0) {}
+
     void addOption(const std::string &option_shortname);
     void addOption(const std::string &option_shortname,
                    const std::string &option_name);

@@ -1,21 +1,22 @@
 #include <fstream>
+#include <iostream>
 #include <map>
 #include <set>
 #include <sstream>
 #include <string>
-#include <iostream>
 
 #include <compress.hpp>
 #include <graph.hpp>
 #include <graph_reader.hpp>
 
 namespace our {
-naive_graph_t<int> read_file(std::string filename, OptParser parser) {
+naive_graph_t<int> read_file(const std::string &filename, OptParser &parser) {
     /* it's safe to use namespace within a function */
     using namespace std;
 
     int vertex_count = 0;
     int edge_count = 0;
+    cerr << "Filename: " << filename << endl;
     ifstream input_graph(filename);
     if (input_graph.is_open()) {
         string text_line;
@@ -43,8 +44,7 @@ naive_graph_t<int> read_file(std::string filename, OptParser parser) {
                 adj[key[e.second]].push_back(key[e.first]);
         }
         return {adj, vertex_count};
-    }
-    else {
+    } else {
         cerr << "File does not open. Check filename provided.\n";
     }
 }

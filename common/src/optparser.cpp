@@ -1,7 +1,8 @@
 #include <algorithm>
 #include <iostream>
-#include <optparser.hpp>
 #include <string>
+
+#include <optparser.hpp>
 
 namespace our {
 
@@ -23,7 +24,8 @@ bool OptParser::checkOption(const std::string &option, int is_short) {
     return true;
 }
 
-std::string OptParser::stripOptionName(const std::string &option, int is_short) {
+std::string OptParser::stripOptionName(const std::string &option,
+                                       int is_short) {
     if (is_short)
         return std::string(1, option[1]);
     else
@@ -50,7 +52,7 @@ void OptParser::addOption(const std::string &option_shortname,
                           const std::string &option_name) {
     if (checkOption(option_shortname) && checkOption(option_name, 0)) {
         addToOptList(stripOptionName(option_shortname));
-        name_to_shortname[stripOptionName(option_name)] =
+        name_to_shortname[stripOptionName(option_name, 0)] =
             stripOptionName(option_shortname);
     } else {
         std::cerr << "(" << option_shortname << ", " << option_name
@@ -59,7 +61,7 @@ void OptParser::addOption(const std::string &option_shortname,
 }
 
 void OptParser::parse(int argc, const char **argv) {
-    for (int i = 0; i < argc; i++) {
+    for (int i = 1; i < argc; i++) {
         std::string current_option(argv[i]);
         std::string shortname;
         if (checkOption(current_option)) {
@@ -94,14 +96,17 @@ int OptParser::checkIncluded(const std::string &option) {
                       << " has not been added to the list of options\n";
             return -1;
         } else {
-            return list_of_options_short[option];
+            return (list_of_options_short[option] == true) ? 1 : 0;
         }
     } else {
         if (name_to_shortname.find(option) == name_to_shortname.end()) {
             std::cerr << option
                       << " has not been added to the list of options\n";
+            return -1;
         } else {
-            return list_of_options_short[name_to_shortname[option]];
+            return (list_of_options_short[name_to_shortname[option]] == true
+                        ? 1
+                        : 0);
         }
     }
 }
