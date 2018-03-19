@@ -71,6 +71,19 @@ template <typename edge_t> struct graph_t {
     }
 };
 
+template <typename edge_t> struct LWCC_t : graph_t<edge_t> {
+    bool in_LWCC(int i);
+    int size_LWCC();
+
+    LWCC_t(const std::vector<std::vector<edge_t>> &adj)
+        : graph_t<edge_t>(adj), visited(adj.size(), false) {}
+
+  private:
+    std::vector<bool> visited;
+    int n; /* number of vertices in LWCC */
+    void iterative_dfs(int source);
+};
+
 } // namespace our
 
 #endif
