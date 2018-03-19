@@ -4,3 +4,4 @@ project(CentralityThings)
 
 add_subdirectory(bwc)
 add_subdirectory(common)
+add_subdirectory(cc)
