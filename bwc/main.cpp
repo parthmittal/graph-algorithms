@@ -2,13 +2,14 @@
 #include <iostream>
 
 #include <brandes.hpp>
+#include <ed-dfs.hpp>
 #include <graph.hpp>
 
 int main() {
     using namespace std;
     using namespace our;
 
-    /* read graph from STDIN, write betweenness centrality to STDOUT */
+    /* read graph from STDIN, write ear decomposition to STDOUT */
 
     int N, M;
     cin >> N >> M;
@@ -23,8 +24,22 @@ int main() {
 
     graph_t<int> graph(adj);
 
-    cout << fixed << setprecision(6);
-    for (const double &d : brandes::bwc_all(graph)) {
-        cout << d << endl;
+    ed_dfs::two_connected_prop ed_wrapper(graph);
+    ed_wrapper.ear_decompose();
+
+    /* iterate over biconnected components */
+    int cid = 1; /* component id */
+    for (auto &bcc : ed_wrapper.ear_decomposition) {
+        cout << "BCC #" << cid << endl;
+        int eid = 1; /* ear id within component */
+        for (auto &ear : bcc) {
+            cout << "    Ear #" << eid << '\n';
+            for (auto &edge : ear) {
+                cout << "        " << edge.first << " -> " << edge.second
+                     << '\n';
+            }
+            ++eid;
+        }
+        ++cid;
     }
 }
