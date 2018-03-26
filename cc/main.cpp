@@ -1,6 +1,7 @@
 #include <cmath>
 #include <ctime>
 #include <iostream>
+#include <vector>
 
 /* headers from ../common/include */
 #include <graph.hpp>
@@ -67,10 +68,10 @@ int main(int argc, const char **argv) {
         if (parser.checkIncluded("strategy_1"))
             b_eccentricity_crs = our::bounding_eccentricities(
                 main_graph, main_graph.N, 1, parser);
-        if (parser.checkIncluded("strategy_2"))
+        else if (parser.checkIncluded("strategy_2"))
             b_eccentricity_crs = our::bounding_eccentricities(
                 main_graph, main_graph.N, 2, parser);
-        if (parser.checkIncluded("strategy_3"))
+        else if (parser.checkIncluded("strategy_3"))
             b_eccentricity_crs = our::bounding_eccentricities(
                 main_graph, main_graph.N, 3, parser);
         time_taken = (clock() - tStart) / CLOCKS_PER_SEC;
