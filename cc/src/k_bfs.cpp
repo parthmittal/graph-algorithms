@@ -17,11 +17,11 @@
  */
 template <typename graph_type>
 void bfs(int source, int root, const graph_type &G,
-         std::vector<pair<int, int>> &dist, vector<__int128> visited) {
+         std::vector<std::pair<int, int>> &dist, std::vector<unsigned __int128> &visited) {
     dist[source].second = 0;
     dist[source].first = std::max(dist[source].first, dist[source].second);
-    visited[source] = visited[v] | (1 << root);
-    queue<int> q;
+    visited[source] = visited[source] | (1 << root);
+    std::queue<int> q;
     q.push(source);
     while (!q.empty()) {
         int u = q.front();
@@ -40,13 +40,14 @@ void bfs(int source, int root, const graph_type &G,
 template <typename graph_type>
 std::vector<int> k_bfs(const graph_type &G, int k, int N) {
     srand((int)time(0));
+    const int inf = 1e9;
     std::vector<__int128> visited(N, 0);
-    std::vector<pair<int, int>> dist(N, {0, inf});
+    std::vector<std::pair<int, int>> dist(N, {0, inf});
 
     /* generate k distinct vertices */
     std::set<int> k_vertices;
     while (k_vertices.size() < k) {
-        int a = (rand() % n);
+        int a = (rand() % N);
         k_vertices.insert(a);
     }
 
@@ -73,10 +74,13 @@ std::vector<int> k_bfs(const graph_type &G, int k, int N) {
      * distance
      */
     std::fill(visited.begin(), visited.end(), 0);
-    int root = 0;
+    root = 0;
     for (auto &i : farthest) {
         bfs(i, root++, G, dist, visited);
     }
+
+    /* Setting the eccentricity of u to the max for v belonging to k_vertices,
+     * farthest of d(v, u) */
     std::vector<int> eccentricity(N);
     for (int i = 0; i < N; i++) {
         eccentricity[i] = dist[i].first;
