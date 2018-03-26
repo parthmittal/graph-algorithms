@@ -12,12 +12,12 @@ namespace our {
 
 template <typename edge_t> struct naive_graph_t {
     std::vector<std::vector<edge_t>> adj;
-    int vertex_count;
+    int N;
 
-    naive_graph_t(const std::vector<std::vector<edge_t>> &adj, int vertex_cnt)
-        : adj(adj), vertex_count(vertex_cnt) {}
+    naive_graph_t(const std::vector<std::vector<edge_t>> &adj)
+        : adj(adj), N(adj.size()) {}
 
-    naive_graph_t() : vertex_count(0) {}
+    naive_graph_t() : N(0) {}
 };
 
 template <typename edge_t> struct crs_row_t {
@@ -81,6 +81,20 @@ template <typename edge_t> struct LWCC_t : graph_t<edge_t> {
   private:
     std::vector<bool> visited;
     int n; /* number of vertices in LWCC */
+    void iterative_dfs(int source);
+};
+
+template <typename edge_t> struct naive_LWCC_t : naive_graph_t<edge_t> {
+    bool in_LWCC(int i);
+    int size_LWCC();
+
+    naive_LWCC_t(const std::vector<std::vector<edge_t>> &adj)
+        : naive_graph_t<edge_t>(adj), visited(adj.size(), false) {}
+
+  private:
+    std::
+    vector<bool> visited;
+    int n;
     void iterative_dfs(int source);
 };
 
