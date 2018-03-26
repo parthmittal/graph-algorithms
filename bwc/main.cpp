@@ -20,6 +20,6 @@ int main(int argc, const char **argv) {
     int a = parser.checkIncluded("a");
     auto graph = our::read_file(
         "/home/kushagra/Desktop/6/IP/graph-algorithms/Email-Enron.txt", parser);
-    cout << "Vertex count in Enron: " << graph.vertex_count << endl;
+    cout << "Vertex count in Enron: " << graph.N << endl;
     return 0;
 }
