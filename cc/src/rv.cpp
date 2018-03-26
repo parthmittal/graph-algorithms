@@ -6,7 +6,9 @@
 #include <vector>
 #include <set>
 
-#include <graph.hpp>
+#include <rv.hpp>
+
+using namespace our;
 
 /*
  * a traditional bfs that maintains the distance from a set of vertices

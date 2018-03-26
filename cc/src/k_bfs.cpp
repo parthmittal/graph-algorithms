@@ -4,6 +4,7 @@
 #include <set>
 #include <vector>
 
+#include <k_bfs.hpp>
 #include <graph.hpp>
 
 /*

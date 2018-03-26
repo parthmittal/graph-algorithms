@@ -4,6 +4,7 @@
 #include <queue>
 #include <vector>
 
+#include <bounding_eccentricities.hpp>
 #include <graph.hpp>
 #include <optparser.hpp>
 
@@ -56,7 +57,7 @@ std::vector<int> pruning(const graph_type &G, int N, int &count) {
     count = 0;
 
     for (int i = 0; i < N; i++) {
-        if (!G.G.in_LWCC(i))
+        if (!G.in_LWCC(i))
             continue;
 
         int degree = G[i].size();
@@ -74,7 +75,7 @@ std::vector<int> pruning(const graph_type &G, int N, int &count) {
                     pruned[v] = v;
                     count++;
                     pruned[prunee] =
-                        -2; // when the neighbours of prunee are prunekkk
+                        -2; // when the neighbours of prunee are pruned
                 }
             }
         }
@@ -89,7 +90,7 @@ std::vector<int> pruning(const graph_type &G, int N, int &count) {
 template <typename graph_type>
 int select_from(int STRATEGY, const std::vector<bool> &is_candidate,
                 const graph_type &G, const std::vector<int> &lower,
-                const std::vector<int> &upper, const std::vector<int> d,
+                const std::vector<int> &upper, const std::vector<int> &d,
                 bool &high, int N) {
     int to_return;
     if (STRATEGY == 1) // select the node with largest upper - lower difference,
@@ -181,7 +182,7 @@ std::vector<int> bounding_eccentricities(const graph_type &G, int N,
         } else {
             current = select_from(STRATEGY, is_candidate, G, ecc_lower,
                                   ecc_upper, d, high, N);
-            }
+        }
         // run a bfs fron the selected node
         d = ECCENTRICITY(G, current, N);
 
@@ -224,4 +225,16 @@ std::vector<int> bounding_eccentricities(const graph_type &G, int N,
                   << std::endl;
 #endif
     }
+    if (PRUNE) {
+        for (int i = 0; i < N; i++) {
+            if (!G.in_LWCC(i))
+                continue;
+
+            if (pruned[i] >= 0)
+                eccentricity[i] = eccentricity[pruned[i]];
+        }
+    }
+
+    std::cerr << "Number of iterations performed : " << number_of_iterations << endl;
+    return eccentricity;
 }
