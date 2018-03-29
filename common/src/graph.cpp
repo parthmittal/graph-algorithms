@@ -20,12 +20,6 @@ template <typename edge_t> void our::LWCC_t<edge_t>::iterative_dfs(int source) {
     }
 }
 
-template <typename edge_t> bool our::LWCC_t<edge_t>::in_LWCC(int i) {
-    return visited[i];
-}
-
-template <typename edge_t> int our::LWCC_t<edge_t>::size_LWCC() { return n; }
-
 template <typename edge_t>
 void our::naive_LWCC_t<edge_t>::iterative_dfs(int source) {
     std::stack<int> S;
@@ -43,12 +37,4 @@ void our::naive_LWCC_t<edge_t>::iterative_dfs(int source) {
             }
         }
     }
-}
-
-template <typename edge_t> bool our::naive_LWCC_t<edge_t>::in_LWCC(int i) {
-    return visited[i];
-}
-
-template <typename edge_t> int our::naive_LWCC_t<edge_t>::size_LWCC() {
-    return n;
 }
