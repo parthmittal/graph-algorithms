@@ -12,6 +12,11 @@
 
 namespace our {
 using namespace std;
+/*
+ * An iterative bfs implementation that returns the distance vector from the
+ * source.
+ * Here graph_type can take up naive graph type and CRS type.
+ */
 template <typename graph_type>
 vector<int> ECCENTRICITY(const graph_type &G, int source, int N) {
     const int inf = 1e9;
@@ -40,6 +45,14 @@ vector<int> ECCENTRICITY(const graph_type &G, int source, int N) {
     return dist;
 }
 
+/*
+ * Function to prune the degree 1 nodes and create links to nodes that have
+ * similar eccentricity
+ * Returns the vector pruned where pruned[i] takes the following values:
+ * -1 : if this node as well as its neighbours are not pruned
+ * -2 : if the neighbours of this node are pruned
+ * >= 0 : index of the node which is similar to this node
+ */
 template <typename graph_type>
 vector<int> pruning(const graph_type &G, int N, int &count) {
     std::vector<int> pruned(N, -1);
