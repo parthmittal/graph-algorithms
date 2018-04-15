@@ -57,7 +57,10 @@ int main(int argc, const char **argv) {
         else if (parser.checkIncluded("strategy_3"))
             b_eccentricity_naive = our::bounding_eccentricities(
                 naive_graph, naive_graph.N, 3, parser);
-        time_taken = (clock() - tStart) / CLOCKS_PER_SEC;
+//        for (auto &i : b_eccentricity_naive)
+//            cout << i << " ";
+//        cout << endl;
+        time_taken = (clock() - tStart) / (double)CLOCKS_PER_SEC;
         cerr << "Time taken = " << time_taken << endl;
         cerr << "=============================================================="
                 "==="
@@ -74,7 +77,7 @@ int main(int argc, const char **argv) {
         else if (parser.checkIncluded("strategy_3"))
             b_eccentricity_crs = our::bounding_eccentricities(
                 main_graph, main_graph.N, 3, parser);
-        time_taken = (clock() - tStart) / CLOCKS_PER_SEC;
+        time_taken = (clock() - tStart) / (double)(double)CLOCKS_PER_SEC;
         cerr << "Time taken = " << time_taken << endl;
         cerr << "=============================================================="
                 "==="
@@ -96,7 +99,10 @@ int main(int argc, const char **argv) {
         tStart = clock();
         vector<int> kbfs_eccentricity_naive =
             our::k_bfs(naive_graph, 60, naive_graph.N);
-        time_taken = (clock() - tStart) / CLOCKS_PER_SEC;
+        for (auto &i : kbfs_eccentricity_naive)
+            cout << i << " ";
+        cout << endl;
+        time_taken = (clock() - tStart) / (double)CLOCKS_PER_SEC;
         cerr << "Time taken = " << time_taken << endl;
         cerr << "=============================================================="
                 "==="
@@ -105,7 +111,7 @@ int main(int argc, const char **argv) {
         tStart = clock();
         vector<int> kbfs_eccentricity_crs =
             our::k_bfs(main_graph, 60, main_graph.N);
-        time_taken = (clock() - tStart) / CLOCKS_PER_SEC;
+        time_taken = (clock() - tStart) / (double)CLOCKS_PER_SEC;
         cerr << "Time taken = " << time_taken << endl;
         cerr << "=============================================================="
                 "==="
@@ -128,7 +134,10 @@ int main(int argc, const char **argv) {
         tStart = clock();
         vector<int> rv_eccentricity_naive =
             our::RV_algorithm(naive_graph, naive_graph.N, s);
-        time_taken = (clock() - tStart) / CLOCKS_PER_SEC;
+        for (auto &i : rv_eccentricity_naive)
+            cout << i << " ";
+        cout << endl;
+        time_taken = (clock() - tStart) / (double)CLOCKS_PER_SEC;
         cerr << "Time taken = " << time_taken << endl;
         cerr << "=============================================================="
                 "==="
@@ -137,7 +146,7 @@ int main(int argc, const char **argv) {
         tStart = clock();
         vector<int> rv_eccentricity_crs =
             our::RV_algorithm(main_graph, main_graph.N, s);
-        time_taken = (clock() - tStart) / CLOCKS_PER_SEC;
+        time_taken = (clock() - tStart) / (double)CLOCKS_PER_SEC;
         cerr << "Time taken = " << time_taken << endl;
         cerr << "=============================================================="
                 "==="
@@ -147,5 +156,28 @@ int main(int argc, const char **argv) {
              << endl;
     }
 
+    tStart = clock();
+    for(int i = 0; i < naive_graph.N; i++)
+    {
+        if(naive_graph.in_LWCC(i))
+           vector<int> D = our::ECCENTRICITY(naive_graph, i, naive_graph.N);
+    }
+    time_taken = (clock() - tStart) / (double)CLOCKS_PER_SEC;
+    cerr << "Time taken = " << time_taken << endl;
+    cerr << "=============================================================="
+            "==="
+         << endl;
+
+    tStart = clock();         
+    for(int i = 0; i < main_graph.N; i++)
+    {
+        if(main_graph.in_LWCC(i))
+            vector<int> D = our::ECCENTRICITY(main_graph, i, main_graph.N);
+    }
+    time_taken = (clock() - tStart) / (double)CLOCKS_PER_SEC;
+    cerr << "Time taken = " << time_taken << endl;
+    cerr << "=============================================================="
+            "==="
+         << endl;
     return 0;
 }
