@@ -4,6 +4,8 @@
 #include <brandes.hpp>
 #include <ed-dfs.hpp>
 #include <graph.hpp>
+#include <graph_reader.hpp>
+#include <optparser.hpp>
 
 int main() {
     using namespace std;

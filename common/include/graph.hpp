@@ -1,5 +1,7 @@
 #include <algorithm>
+#include <iostream>
 #include <map>
+#include <stack>
 #include <utility>
 #include <vector>
 
@@ -12,12 +14,19 @@ namespace our {
 
 template <typename edge_t> struct naive_graph_t {
     std::vector<std::vector<edge_t>> adj;
-    int vertex_count;
+    int N;
 
-    naive_graph_t(const std::vector<std::vector<edge_t>> &adj, int vertex_cnt)
-        : adj(adj), vertex_count(vertex_cnt) {}
+    naive_graph_t(const std::vector<std::vector<edge_t>> &adj)
+        : adj(adj), N(adj.size()) {}
 
-    naive_graph_t() : vertex_count(0) {}
+    const std::vector<edge_t> &operator[](int u) const {
+#ifdef DEBUG
+        assert(0 <= u && u < N);
+#endif
+        return {adj[u]};
+    }
+
+    naive_graph_t() : N(0) {}
 };
 
 template <typename edge_t> struct crs_row_t {
@@ -68,6 +77,105 @@ template <typename edge_t> struct graph_t {
         assert(0 <= u && u < N);
 #endif
         return {crs, si[u], ei[u]};
+    }
+};
+
+template <typename edge_t> struct LWCC_t : graph_t<edge_t> {
+    bool in_LWCC(int i) const { return visited[i]; }
+    int size_LWCC() const { return n; }
+
+    LWCC_t(const std::vector<std::vector<edge_t>> &adj)
+        : graph_t<edge_t>(adj), visited(adj.size(), 0), n(0) {
+
+        int max_source = -1, max_count = 0;
+        for (int i = 0; i < adj.size(); i++) {
+            if (!visited[i]) {
+                int temp_count = 0;
+                iterative_dfs(i, temp_count);
+                if (temp_count > max_count) {
+                    max_source = i;
+                    max_count = temp_count;
+                }
+            }
+        }
+        std::fill(visited.begin(), visited.end(), 0);
+        iterative_dfs(max_source, n);
+
+        std::cerr
+            << "The number of nodes in the largest weakly connected component: "
+            << n << std::endl;
+    }
+
+  private:
+    std::vector<int> visited;
+    int n; /* number of vertices in LWCC */
+    void iterative_dfs(int source, int &comp_count) {
+        std::stack<int> S;
+        S.push(source);
+        while (!S.empty()) {
+            int u = S.top();
+            S.pop();
+            if (visited[u])
+                continue;
+            visited[u] = true;
+            comp_count++;
+
+            for (int i = graph_t<edge_t>::si[u]; i < graph_t<edge_t>::ei[u];
+                 i++) {
+                if (!visited[graph_t<edge_t>::crs[i]]) {
+                    S.push(graph_t<edge_t>::crs[i]);
+                }
+            }
+        }
+    }
+};
+
+template <typename edge_t> struct naive_LWCC_t : naive_graph_t<edge_t> {
+    bool in_LWCC(int i) const { return visited[i]; }
+    int size_LWCC() const { return n; }
+
+    naive_LWCC_t(const std::vector<std::vector<edge_t>> &adj)
+        : naive_graph_t<edge_t>(adj), visited(adj.size(), false), n(0) {
+
+        int max_source = -1, max_count = 0;
+        for (int i = 0; i < adj.size(); i++) {
+            if (!visited[i]) {
+                int temp_count = 0;
+                iterative_dfs(i, temp_count);
+                if (temp_count > max_count) {
+                    max_source = i;
+                    max_count = temp_count;
+                }
+            }
+        }
+        std::fill(visited.begin(), visited.end(), 0);
+        iterative_dfs(max_source, n);
+
+        std::cerr << "The number of nodes in the largest weakly connected "
+                     "component are : "
+                  << n << std::endl;
+    }
+
+  private:
+    std::vector<int> visited;
+    int n;
+    void iterative_dfs(int source, int &comp_count) {
+        std::stack<int> S;
+        S.push(source);
+        while (!S.empty()) {
+            int u = S.top();
+            S.pop();
+            if (visited[u])
+                continue;
+            visited[u] = true;
+            comp_count++;
+
+            for (int i = 0; i < naive_graph_t<edge_t>::adj[u].size(); i++) {
+                if (!visited[naive_graph_t<edge_t>::adj[u][i]]) {
+                    S.push(naive_graph_t<edge_t>::adj[u][i]);
+                }
+            }
+        }
     }
 };
 
