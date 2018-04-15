@@ -156,28 +156,28 @@ int main(int argc, const char **argv) {
              << endl;
     }
 
-    tStart = clock();
-    for(int i = 0; i < naive_graph.N; i++)
-    {
-        if(naive_graph.in_LWCC(i))
-           vector<int> D = our::ECCENTRICITY(naive_graph, i, naive_graph.N);
-    }
-    time_taken = (clock() - tStart) / (double)CLOCKS_PER_SEC;
-    cerr << "Time taken = " << time_taken << endl;
-    cerr << "=============================================================="
-            "==="
-         << endl;
+    // tStart = clock();
+    // for(int i = 0; i < naive_graph.N; i++)
+    // {
+    //     if(naive_graph.in_LWCC(i))
+    //        vector<int> D = our::ECCENTRICITY(naive_graph, i, naive_graph.N);
+    // }
+    // time_taken = (clock() - tStart) / (double)CLOCKS_PER_SEC;
+    // cerr << "Time taken = " << time_taken << endl;
+    // cerr << "=============================================================="
+    //         "==="
+    //      << endl;
 
-    tStart = clock();         
-    for(int i = 0; i < main_graph.N; i++)
-    {
-        if(main_graph.in_LWCC(i))
-            vector<int> D = our::ECCENTRICITY(main_graph, i, main_graph.N);
-    }
-    time_taken = (clock() - tStart) / (double)CLOCKS_PER_SEC;
-    cerr << "Time taken = " << time_taken << endl;
-    cerr << "=============================================================="
-            "==="
-         << endl;
+    // tStart = clock();         
+    // for(int i = 0; i < main_graph.N; i++)
+    // {
+    //     if(main_graph.in_LWCC(i))
+    //         vector<int> D = our::ECCENTRICITY(main_graph, i, main_graph.N);
+    // }
+    // time_taken = (clock() - tStart) / (double)CLOCKS_PER_SEC;
+    // cerr << "Time taken = " << time_taken << endl;
+    // cerr << "=============================================================="
+    //         "==="
+    //      << endl;
     return 0;
 }
