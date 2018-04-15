@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <climits>
+#include <iostream>
 #include <queue>
 #include <set>
 #include <vector>
@@ -11,8 +12,8 @@ namespace our {
 template <typename graph_type>
 void bfs(int source, int root, const graph_type &G,
          std::vector<std::vector<int>> &dist,
-         std::vector<std::vector<bool>> &visited,
-         std::vector<int> &eccentricity, bool update_eccentricity) {
+         std::vector<std::vector<int>> &visited, std::vector<int> &eccentricity,
+         bool update_eccentricity) {
     dist[root][source] = 0;
     if (update_eccentricity)
         eccentricity[source] =
@@ -35,10 +36,10 @@ void bfs(int source, int root, const graph_type &G,
 }
 
 template <typename graph_type>
-std::vector<int>
-modified_bfs(int source, const graph_type &G, std::vector<int> &dist,
-             std::vector<bool> &visited, std::vector<int> &eccentricity,
-             std::set<int> &Ns_w, int s, int N) {
+std::vector<int> modified_bfs(int source, const graph_type &G,
+                              std::vector<int> &dist, std::vector<int> &visited,
+                              std::vector<int> &eccentricity,
+                              std::set<int> &Ns_w, int s, int N) {
     std::vector<int> parent;
     std::vector<int> closest_on_path(N);
     dist[source] = 0;
@@ -84,7 +85,7 @@ std::vector<int> RV_algorithm(const graph_type &G, int N, int s) {
     /* sample s vertices from the largest WCC */
     std::vector<int> sampled_vertices;
     std::set<int> temp_sample;
-    std::vector<bool> found(N, false);
+    std::vector<int> found(N, false);
     srand((int)time(0));
     while (temp_sample.size() < s) {
         int a = (rand() % N);
@@ -92,6 +93,7 @@ std::vector<int> RV_algorithm(const graph_type &G, int N, int s) {
             temp_sample.insert(a);
         }
     }
+    std::cerr << s << " vertices sampled" << endl;
     for (auto &i : temp_sample) {
         sampled_vertices.push_back(i);
         found[i] = true;
@@ -100,7 +102,7 @@ std::vector<int> RV_algorithm(const graph_type &G, int N, int s) {
     /* perform bfs from the sampled vertices */
     const int inf = -1;
     std::vector<std::vector<int>> dist(s + 1, std::vector<int>(N, inf));
-    std::vector<std::vector<bool>> visited(s + 1, std::vector<bool>(N, false));
+    std::vector<std::vector<int>> visited(s + 1, std::vector<int>(N, false));
     std::vector<int> eccentricity(N, 0);
     for (int i = 0; i < s; i++) {
         bfs(sampled_vertices[i], i, G, dist, visited, eccentricity, true);

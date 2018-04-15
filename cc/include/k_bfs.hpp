@@ -10,9 +10,10 @@
 #define __K_BFS_HPP__
 
 namespace our {
-	typedef unsigned __int128 int128;
+typedef unsigned __int128 int128;
 /*
- * A standard max_dist_bfs implementation which updates the dist vector so as to find the
+ * A standard max_dist_bfs implementation which updates the dist vector so as to
+ * find the
  * max distance from a set of vertices
  * source is the source of the max_dist_bfs
  * root represents the kth time for which this max_dist_bfs is run
@@ -22,21 +23,21 @@ namespace our {
  */
 template <typename graph_type>
 void max_dist_bfs(int source, int root, const graph_type &G,
-         std::vector<std::pair<int, int>> &dist,
-         std::vector<int128> &visited) {
+                  std::vector<std::pair<int, int>> &dist,
+                  std::vector<std::vector<int>> &visited) {
     dist[source].second = 0;
     dist[source].first = std::max(dist[source].first, dist[source].second);
-    visited[source] = visited[source] | (1 << root);
+    visited[root][source] = 1;
     std::queue<int> q;
     q.push(source);
     while (!q.empty()) {
         int u = q.front();
         q.pop();
         for (auto &i : G[u]) {
-            if (!(visited[i] & (1 << root))) {
+            if (!(visited[root][i])) {
                 dist[i].second = dist[u].second + 1;
                 dist[i].first = std::max(dist[i].second, dist[i].first);
-                visited[i] = visited[i] | (1 << root);
+                visited[root][i] = 1;
                 q.push(i);
             }
         }
@@ -47,7 +48,7 @@ template <typename graph_type>
 std::vector<int> k_bfs(const graph_type &G, int k, int N) {
     srand((int)time(0));
     const int inf = 1e9;
-    std::vector<int128> visited(N, 0);
+    std::vector<std::vector<int>> visited(k, std::vector<int>(N, 0));
     std::vector<std::pair<int, int>> dist(N, {0, inf});
 
     /* generate k distinct vertices */
@@ -58,8 +59,9 @@ std::vector<int> k_bfs(const graph_type &G, int k, int N) {
     }
 
     /* PHASE 1
-     * run max_dist_bfs from each of the k_vertices and keep a track of max distance from
-     * these vertices */
+     * run max_dist_bfs from each of the k_vertices and keep a track of max
+     * distance from these vertices
+     */
     int root = 0;
     for (auto &v : k_vertices) {
         max_dist_bfs<graph_type>(v, root++, G, dist, visited);
@@ -76,12 +78,16 @@ std::vector<int> k_bfs(const graph_type &G, int k, int N) {
     }
 
     /* PHASE 2
-     * running max_dist_bfs from the set of farthest vertices and maintaining max
-     * distance
+     * running max_dist_bfs from the set of farthest vertices and maintaining
+     * max distance
      */
-    std::fill(visited.begin(), visited.end(), 0);
+    for (int i = 0; i < k; i++) {
+        std::fill(visited[i].begin(), visited[i].end(), 0);
+    }
     root = 0;
     for (auto &i : farthest) {
+        if (root == k)
+            break;
         max_dist_bfs(i, root++, G, dist, visited);
     }
 
