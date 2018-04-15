@@ -13,7 +13,9 @@ namespace ed_dfs {
 two_connected_prop::two_connected_prop(const graph_t<int> &G)
     : G(G), visited(G.N), parent(G.N), back_edges(G.N), entry_time(G.N),
       exit_time(G.N), vert(G.N + 1), visited_ear_decomposition(G.N),
-      ears_of(G.N) {}
+      ears_of(G.N) {
+    ear_decompose();
+}
 
 void two_connected_prop::dfs(int root, int &current_time) {
     std::stack<dfs_stack_elem_t> dfs_stack;
