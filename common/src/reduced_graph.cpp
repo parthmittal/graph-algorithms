@@ -9,7 +9,7 @@ namespace our {
 rgraph_hack_t::rgraph_hack_t(const graph_t<int> &G,
                              const ed_dfs::two_connected_prop &two)
     : id(G.N, -1), leftV(G.N, -1), rightV(G.N, -1), leftD(G.N), rightD(G.N),
-      joint_id(G.N) {
+      joint_id(G.N), sig() {
     using namespace std;
     using namespace ed_dfs;
 
@@ -50,6 +50,11 @@ rgraph_hack_t::rgraph_hack_t(const graph_t<int> &G,
                     reverse(active.begin(), active.end());
                 }
 
+                if (weight >= 2) {
+                    sig[id[u]] = 1;
+                    sig[id[v]] = 1;
+                }
+
                 int temp = 1;
                 for (auto &w : active) {
                     /* these are all the vertices between u and v
@@ -84,6 +89,7 @@ void rgraph_hack_t::add_vertex(int v) {
         rid.push_back(v);
         id[v] = adj.size();
         adj.push_back({});
+        sig.push_back(0);
     }
 }
 } // namespace our

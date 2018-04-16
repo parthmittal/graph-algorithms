@@ -2,17 +2,23 @@
 #include <iostream>
 
 #include <brandes.hpp>
+#include <bwc_our.hpp>
 #include <ed-dfs.hpp>
 #include <graph.hpp>
 #include <graph_reader.hpp>
 #include <optparser.hpp>
 #include <reduced_graph.hpp>
 
-int main() {
+namespace our {
+    OptParser config;
+};
+
+int main(int argc, const char **argv) {
     using namespace std;
     using namespace our;
 
-    /* read graph from STDIN, write ear decomposition to STDOUT */
+    config.addOption("-d", "--dry-run");
+    config.parse(argc, argv);
 
     int N, M;
     cin >> N >> M;
@@ -55,5 +61,13 @@ int main() {
             }
             printf(" -- %d (%d)\n", rgraph.rid[e.v], e.v);
         }
+    }
+
+    bwc_our bc_wrapper(graph);
+    bc_wrapper.sim_brandes_all();
+
+    cout << fixed << setprecision(5);
+    for (int i = 0; i < graph.N; ++i) {
+        cout << bc_wrapper.bwc[i] << '\n';
     }
 }
