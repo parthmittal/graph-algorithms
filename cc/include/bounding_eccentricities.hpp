@@ -2,9 +2,11 @@
 #include <iostream>
 #include <iterator>
 #include <queue>
+#include <set>
 #include <vector>
 
 #include <graph.hpp>
+#include <graph_reader.hpp>
 #include <optparser.hpp>
 
 #ifndef __BOUNDING_ECCENTRICITY_HPP__
@@ -46,6 +48,32 @@ vector<int> ECCENTRICITY(const graph_type &G, int source, int N) {
     return dist;
 }
 
+template <>
+vector<int> ECCENTRICITY<reduced_LWCC_t>(const reduced_LWCC_t &G, int source,
+                                          int N) {
+    const int inf = 1e9;
+    typedef int vertex_t;
+    typedef int weight_t;
+    std::vector<int> dist(N, inf);
+    dist[source] = 0;
+    std::set<std::pair<weight_t, vertex_t>> q;
+    q.insert({dist[source], source});
+    while (!q.empty()) {
+        weight_t ref_w = q.begin()->first;
+        vertex_t u = q.begin()->second;
+        q.erase(q.begin());
+        for (auto &fat_edge : G[u]) {
+            vertex_t v = fat_edge.v;
+            weight_t w = fat_edge.weight;
+            weight_t dist_through_u = ref_w + w;
+            if(dist_through_u < dist[v]) {
+                q.erase({dist[v], v});
+                dist[v] = dist_through_u;
+                q.insert({dist[v], v});
+            }
+        }
+    }
+}
 /*
  * Function to prune the degree 1 nodes and create links to nodes that have
  * similar eccentricity

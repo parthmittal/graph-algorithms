@@ -4,9 +4,11 @@
 #include <vector>
 
 /* headers from ../common/include */
+#include <ed-dfs.hpp>
 #include <graph.hpp>
 #include <graph_reader.hpp>
 #include <optparser.hpp>
+#include <reduced_graph.hpp>
 
 /* headers from ./include */
 #include <bounding_eccentricities.hpp>
@@ -33,6 +35,9 @@ int main(int argc, const char **argv) {
 
     our::naive_LWCC_t<int> naive_graph(graph.adj);
     our::LWCC_t<int> main_graph(graph.adj);
+    our::graph_t<int> temp_graph(graph.adj);
+    our::reduced_LWCC_t reduced_graph(
+        temp_graph, our::ed_dfs::two_connected_prop(temp_graph));
 
     double time_taken;
     clock_t tStart;
@@ -57,9 +62,9 @@ int main(int argc, const char **argv) {
         else if (parser.checkIncluded("strategy_3"))
             b_eccentricity_naive = our::bounding_eccentricities(
                 naive_graph, naive_graph.N, 3, parser);
-//        for (auto &i : b_eccentricity_naive)
-//            cout << i << " ";
-//        cout << endl;
+        //        for (auto &i : b_eccentricity_naive)
+        //            cout << i << " ";
+        //        cout << endl;
         time_taken = (clock() - tStart) / (double)CLOCKS_PER_SEC;
         cerr << "Time taken = " << time_taken << endl;
         cerr << "=============================================================="
@@ -77,6 +82,27 @@ int main(int argc, const char **argv) {
         else if (parser.checkIncluded("strategy_3"))
             b_eccentricity_crs = our::bounding_eccentricities(
                 main_graph, main_graph.N, 3, parser);
+        time_taken = (clock() - tStart) / (double)(double)CLOCKS_PER_SEC;
+        cerr << "Time taken = " << time_taken << endl;
+        cerr << "=============================================================="
+                "==="
+             << endl;
+        cerr << "--------------------------------------------------------------"
+                "---"
+             << endl;
+
+        cerr << "Graph type : Reduced Graph : Biconnected component" << endl;
+        tStart = clock();
+        vector<int> b_eccentricity_reduced;
+        if (parser.checkIncluded("strategy_1"))
+            b_eccentricity_reduced = our::bounding_eccentricities(
+                reduced_graph, reduced_graph.N, 1, parser);
+        else if (parser.checkIncluded("strategy_2"))
+            b_eccentricity_reduced = our::bounding_eccentricities(
+                reduced_graph, reduced_graph.N, 2, parser);
+        else if (parser.checkIncluded("strategy_3"))
+            b_eccentricity_reduced = our::bounding_eccentricities(
+                reduced_graph, reduced_graph.N, 3, parser);
         time_taken = (clock() - tStart) / (double)(double)CLOCKS_PER_SEC;
         cerr << "Time taken = " << time_taken << endl;
         cerr << "=============================================================="
@@ -168,7 +194,7 @@ int main(int argc, const char **argv) {
     //         "==="
     //      << endl;
 
-    // tStart = clock();         
+    // tStart = clock();
     // for(int i = 0; i < main_graph.N; i++)
     // {
     //     if(main_graph.in_LWCC(i))
