@@ -6,6 +6,7 @@
 #include <graph.hpp>
 #include <graph_reader.hpp>
 #include <optparser.hpp>
+#include <reduced_graph.hpp>
 
 int main() {
     using namespace std;
@@ -27,7 +28,7 @@ int main() {
     graph_t<int> graph(adj);
 
     ed_dfs::two_connected_prop ed_wrapper(graph);
-    ed_wrapper.ear_decompose();
+    ed_wrapper.bring_largest_front();
 
     /* iterate over biconnected components */
     int cid = 1; /* component id */
@@ -43,5 +44,16 @@ int main() {
             ++eid;
         }
         ++cid;
+    }
+
+    reduced_graph_t rgraph(graph, ed_wrapper);
+    for (int u = 0; u < rgraph.N; ++u) {
+        for (auto &e : rgraph[u]) {
+            printf("%d (%d)", rgraph.rid[u], u);
+            for (auto &w : e.vids) {
+                printf(" -- %d", w);
+            }
+            printf(" -- %d (%d)\n", rgraph.rid[e.v], e.v);
+        }
     }
 }

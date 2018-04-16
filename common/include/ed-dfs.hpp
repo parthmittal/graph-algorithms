@@ -42,6 +42,7 @@ class two_connected_prop {
     int find_ears(int u, int parent_ears);
 
     void ear_decompose();
+    void bring_largest_front();
 };
 
 } // namespace ed_dfs

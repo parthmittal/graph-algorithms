@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <chrono>
+#include <cstdio>
 #include <iostream>
 #include <stack>
 #include <vector>
@@ -100,6 +101,22 @@ void two_connected_prop::ear_decompose() {
     }
 
     ear_decomposition.erase(ear_decomposition.begin());
+}
+
+void two_connected_prop::bring_largest_front() {
+    int sz_max = 0;
+    for (int i = 0; i < ear_decomposition.size(); ++i) {
+        int sz = 1;
+        for (auto &ear : ear_decomposition[i]) {
+            sz += ear.size() - 1;
+        }
+        if (sz > sz_max) {
+            swap(ear_decomposition[0], ear_decomposition[i]);
+            sz_max = sz;
+        }
+    }
+    fprintf(stderr, "largest bcc has (%d) vertices ~ %0.2F percent\n", sz_max,
+            100 * sz_max / double(G.N));
 }
 } // namespace ed_dfs
 } // namespace our

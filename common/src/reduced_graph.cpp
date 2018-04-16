@@ -14,7 +14,11 @@ rgraph_hack_t::rgraph_hack_t(const graph_t<int> &G,
     using namespace ed_dfs;
 
     /* NB: currently we expect that G is two-connected */
-    assert(two.ear_decomposition.size() == 1);
+    if (two.ear_decomposition.size() > 1) {
+        cerr << "WARNING: Graph isn't biconnected, working with first "
+                "biconnected component instead"
+             << endl;
+    }
 
     auto &ED = two.ear_decomposition[0];
     int eid = 1;
@@ -41,9 +45,9 @@ rgraph_hack_t::rgraph_hack_t(const graph_t<int> &G,
                 adj[id[u]].push_back({id[v], weight, active});
 
                 if (u != v) { /* if edge corresp. to cycle, only add once */
-                reverse(active.begin(), active.end());
-                adj[id[v]].push_back({id[u], weight, active});
-                reverse(active.begin(), active.end());
+                    reverse(active.begin(), active.end());
+                    adj[id[v]].push_back({id[u], weight, active});
+                    reverse(active.begin(), active.end());
                 }
 
                 int temp = 1;
