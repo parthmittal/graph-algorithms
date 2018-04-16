@@ -101,6 +101,7 @@ void two_connected_prop::ear_decompose() {
     }
 
     ear_decomposition.erase(ear_decomposition.begin());
+    bring_largest_front();
 }
 
 void two_connected_prop::bring_largest_front() {

@@ -34,7 +34,6 @@ int main(int argc, const char **argv) {
     graph_t<int> graph(adj);
 
     ed_dfs::two_connected_prop ed_wrapper(graph);
-    ed_wrapper.bring_largest_front();
 
     /* iterate over biconnected components */
     int cid = 1; /* component id */
