@@ -61,6 +61,8 @@ class OptParser {
     int checkIncluded(const std::string &option);
 };
 
+extern OptParser config;
+
 } // namespace our
 
 #endif
