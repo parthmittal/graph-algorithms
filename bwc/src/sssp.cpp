@@ -32,7 +32,7 @@ void sssp(int source, const reduced_graph_t &G, std::vector<int> &S,
 
     dist[source] = 0;
     num_paths[source] = 1;
-    dfq.push({0, -1, source});
+    dfq.push({0, source});
 
     while (!dfq.empty()) {
         auto curr = dfq.top();
@@ -48,10 +48,10 @@ void sssp(int source, const reduced_graph_t &G, std::vector<int> &S,
                 if (dist[targ] == -1 || weight < dist[targ]) {
                     dist[targ] = weight;
                     num_paths[targ] = 0;
-                    dfq.push({weight, curr.node, targ});
+                    dfq.push({weight, targ});
                 }
                 if (dist[targ] == weight) {
-                    num_paths[targ] += num_paths[node];
+                    num_paths[targ] += num_paths[curr.node];
                 }
             }
         }

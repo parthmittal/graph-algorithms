@@ -49,7 +49,6 @@ int main(int argc, const char **argv) {
             dfs(graph, i, timer);
         }
     }
-    assert(timer == N + 1);
 
     vector<pii> all_edges;
     for (auto &B : bcc) {
