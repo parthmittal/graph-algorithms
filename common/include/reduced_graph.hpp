@@ -21,6 +21,8 @@ struct rgraph_hack_t {
     std::vector<int> leftV, rightV; /* left/right joint */
     std::vector<int> leftD, rightD; /* distance to left/right joint */
     std::vector<int> joint_id;      /* index of ear this node belongs to */
+    std::vector<int> sig; /* does vertex v have at least one edge w/ weight > 1
+                             incident on it */
 
     rgraph_hack_t(const graph_t<int> &G, const ed_dfs::two_connected_prop &two);
     void add_vertex(int v);

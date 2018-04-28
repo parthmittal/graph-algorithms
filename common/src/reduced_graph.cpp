@@ -9,12 +9,16 @@ namespace our {
 rgraph_hack_t::rgraph_hack_t(const graph_t<int> &G,
                              const ed_dfs::two_connected_prop &two)
     : id(G.N, -1), leftV(G.N, -1), rightV(G.N, -1), leftD(G.N), rightD(G.N),
-      joint_id(G.N) {
+      joint_id(G.N), sig() {
     using namespace std;
     using namespace ed_dfs;
 
     /* NB: currently we expect that G is two-connected */
-    assert(two.ear_decomposition.size() == 1);
+    if (two.ear_decomposition.size() > 1) {
+        cerr << "WARNING: Graph isn't biconnected, working with first "
+                "biconnected component instead"
+             << endl;
+    }
 
     auto &ED = two.ear_decomposition[0];
     int eid = 1;
@@ -41,9 +45,14 @@ rgraph_hack_t::rgraph_hack_t(const graph_t<int> &G,
                 adj[id[u]].push_back({id[v], weight, active});
 
                 if (u != v) { /* if edge corresp. to cycle, only add once */
-                reverse(active.begin(), active.end());
-                adj[id[v]].push_back({id[u], weight, active});
-                reverse(active.begin(), active.end());
+                    reverse(active.begin(), active.end());
+                    adj[id[v]].push_back({id[u], weight, active});
+                    reverse(active.begin(), active.end());
+                }
+
+                if (weight >= 2) {
+                    sig[id[u]] = 1;
+                    sig[id[v]] = 1;
                 }
 
                 int temp = 1;
@@ -80,6 +89,7 @@ void rgraph_hack_t::add_vertex(int v) {
         rid.push_back(v);
         id[v] = adj.size();
         adj.push_back({});
+        sig.push_back(0);
     }
 }
 } // namespace our
