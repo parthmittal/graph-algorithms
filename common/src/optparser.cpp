@@ -92,16 +92,20 @@ int OptParser::checkIncluded(const std::string &option) {
     int n = option.length();
     if (n == 1) {
         if (list_of_options_short.find(option) == list_of_options_short.end()) {
+#ifdef DEBUG
             std::cerr << option
                       << " has not been added to the list of options\n";
+#endif
             return -1;
         } else {
             return (list_of_options_short[option] == true) ? 1 : 0;
         }
     } else {
         if (name_to_shortname.find(option) == name_to_shortname.end()) {
+#ifdef DEBUG
             std::cerr << option
                       << " has not been added to the list of options\n";
+#endif
             return -1;
         } else {
             return (list_of_options_short[name_to_shortname[option]] == true
