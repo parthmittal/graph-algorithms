@@ -39,7 +39,7 @@ naive_graph_t<int> read_file(const std::string &filename, OptParser &parser) {
     vector<vector<int>> adj(vertex_count);
     for (auto &e : edge_list) {
         adj[key[e.first]].push_back(key[e.second]);
-        if (!parser.checkIncluded("is_directed"))
+        if (!(parser.checkIncluded("is_directed") == 1))
             adj[key[e.second]].push_back(key[e.first]);
     }
     return {adj};
