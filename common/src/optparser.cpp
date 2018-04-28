@@ -69,20 +69,20 @@ void OptParser::parse(int argc, const char **argv) {
             if (list_of_options_short.find(shortname) ==
                 list_of_options_short.end()) {
                 std::cerr << shortname << " is not a valid option.\n";
-                return;
+                continue;
             }
         } else if (checkOption(current_option, 0)) {
             std::string name = stripOptionName(current_option, 0);
             if (name_to_shortname.find(name) == name_to_shortname.end()) {
                 std::cerr << name << " is not a valid option.\n";
-                return;
+                continue;
             }
             shortname = name_to_shortname[name];
         } else {
             std::cerr
                 << current_option
                 << " is provided in a wrong format, hence cannot be parsed.";
-            return;
+                continue;
         }
         list_of_options_short[shortname] = true;
     }
