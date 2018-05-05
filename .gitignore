@@ -4,3 +4,5 @@ build
 Debug
 Release
 output_files
+data
+script.sh
