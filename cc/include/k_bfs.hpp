@@ -44,6 +44,40 @@ void max_dist_bfs(int source, int root, const graph_type &G,
     }
 }
 
+template <>
+void max_dist_bfs<reduced_graph_t>(int source, int root,
+                                   const reduced_graph_t &G,
+                                   std::vector<std::pair<int, int>> &dist,
+                                   std::vector<std::vector<int>> &visited) {
+    const int inf = 1e9;
+    for (int i = 0; i < dist.size(); i++)
+        dist[i].second = inf;
+    dist[source].second = 0;
+    dist[source].first = std::max(dist[source].first, dist[source].second);
+
+    typedef int vertex_t;
+    typedef int weight_t;
+
+    std::set<std::pair<weight_t, vertex_t>> q;
+    q.insert({dist[source].second, source});
+    while (!q.empty()) {
+        weight_t ref_w = q.begin()->first;
+        vertex_t u = q.begin()->second;
+        q.erase(q.begin());
+        for (auto &fat_edge : G[u]) {
+            vertex_t v = fat_edge.v;
+            weight_t w = fat_edge.weight;
+            weight_t dist_through_u = ref_w + w;
+            if (dist_through_u < dist[v].second) {
+                q.erase({dist[v].second, v});
+                dist[v].second = dist_through_u;
+                dist[v].first = std::max(dist[v].second, dist[v].first);
+                q.insert({dist[v].second, v});
+            }
+        }
+    }
+}
+
 template <typename graph_type>
 std::vector<int> k_bfs(const graph_type &G, int k, int N) {
     srand((int)time(0));

@@ -92,4 +92,35 @@ void rgraph_hack_t::add_vertex(int v) {
         sig.push_back(0);
     }
 }
+
+void BCC_t::dfs(const naive_graph_t<int> &graph, int node, int &timer) {
+    vis[node] = 1;
+    low[node] = ent[node] = timer++;
+
+    for (auto &v : graph.adj[node]) {
+        if (!vis[v]) { /* tree edge */
+            S.push({node, v});
+            p[v] = node;
+            dfs(graph, v, timer);
+            low[node] = std::min(low[node], low[v]);
+            if (low[v] >= ent[node]) {
+                store_bcc(node, v);
+            }
+        } else if (v != p[node] && ent[v] <= ent[node]) { /* back edge */
+            low[node] = std::min(low[node], ent[v]);
+            S.push({node, v});
+        }
+    }
+}
+
+void BCC_t::store_bcc(int u, int v) {
+    std::vector<pii> temp;
+    while (S.top() != std::make_pair(u, v)) {
+        temp.push_back(S.top());
+        S.pop();
+    }
+    temp.push_back(S.top());
+    S.pop();
+    bcc.push_back(temp);  
+}
 } // namespace our

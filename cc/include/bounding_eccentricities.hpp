@@ -14,6 +14,7 @@
 
 namespace our {
 using namespace std;
+
 /*
  * An iterative bfs implementation that returns the distance vector from the
  * source.
@@ -21,7 +22,10 @@ using namespace std;
  */
 template <typename graph_type>
 vector<int> ECCENTRICITY(const graph_type &G, int source, int N) {
+    static int var = 0;
+    var += 1;
     const int inf = 1e9;
+    cerr << "BFS " << var << endl;
     std::vector<int> dist(N, inf);
     std::vector<int> visited(N, false);
     dist[source] = 0;
@@ -49,7 +53,7 @@ vector<int> ECCENTRICITY(const graph_type &G, int source, int N) {
 }
 
 template <>
-vector<int> ECCENTRICITY<reduced_LWCC_t>(const reduced_LWCC_t &G, int source,
+vector<int> ECCENTRICITY<reduced_graph_t>(const reduced_graph_t &G, int source,
                                           int N) {
     const int inf = 1e9;
     typedef int vertex_t;
@@ -66,13 +70,19 @@ vector<int> ECCENTRICITY<reduced_LWCC_t>(const reduced_LWCC_t &G, int source,
             vertex_t v = fat_edge.v;
             weight_t w = fat_edge.weight;
             weight_t dist_through_u = ref_w + w;
-            if(dist_through_u < dist[v]) {
+            if (dist_through_u < dist[v]) {
                 q.erase({dist[v], v});
                 dist[v] = dist_through_u;
                 q.insert({dist[v], v});
             }
         }
     }
+    for (int i = 0; i < N; i++) {
+        if (dist[i] >= inf) {
+            dist[i] = -1;
+        }
+    }
+    return dist;
 }
 /*
  * Function to prune the degree 1 nodes and create links to nodes that have
@@ -85,36 +95,36 @@ vector<int> ECCENTRICITY<reduced_LWCC_t>(const reduced_LWCC_t &G, int source,
 template <typename graph_type>
 vector<int> pruning(const graph_type &G, int N, int &count) {
     std::vector<int> pruned(N, -1);
-    count = 0;
+    // count = 0;
 
-    for (int i = 0; i < N; i++) {
-        if (!G.in_LWCC(i))
-            continue;
+    // for (int i = 0; i < N; i++) {
+    //     if (!G.in_LWCC(i))
+    //         continue;
 
-        int degree = G[i].size();
-        int prunee = -1;
+    //     int degree = G[i].size();
+    //     int prunee = -1;
 
-        for (int j = 0; j < degree; j++) {
-            auto it = G[i].begin();
-            std::advance(it, j);
-            int v = *it;
-            // if degree of v is 1 and its neighbours haven't been pruned.
-            if (G[v].size() == 1 && pruned[v] == -1) {
-                if (prunee == -1) {
-                    prunee = v; // prune all but this one
-                } else {
-                    pruned[v] = v;
-                    count++;
-                    pruned[prunee] =
-                        -2; // when the neighbours of prunee are pruned
-                }
-            }
-        }
-    }
+    //     for (int j = 0; j < degree; j++) {
+    //         auto it = G[i].begin();
+    //         std::advance(it, j);
+    //         int v = *it;
+    //         // if degree of v is 1 and its neighbours haven't been pruned.
+    //         if (G[v].size() == 1 && pruned[v] == -1) {
+    //             if (prunee == -1) {
+    //                 prunee = v; // prune all but this one
+    //             } else {
+    //                 pruned[v] = v;
+    //                 count++;
+    //                 pruned[prunee] =
+    //                     -2; // when the neighbours of prunee are pruned
+    //             }
+    //         }
+    //     }
+    // }
 
-    std::cerr << std::endl
-              << "Number of nodes pruned: " << count << std::endl
-              << std::endl;
+    // std::cerr << std::endl
+    //           << "Number of nodes pruned: " << count << std::endl
+    //           << std::endl;
     return pruned;
 }
 
@@ -198,6 +208,7 @@ vector<int> bounding_eccentricities(const graph_type &G, int N, int STRATEGY,
         pruned = pruning(G, N, prune_count);
     }
 
+    std::cerr << "Size of graph : " << G.size_LWCC() << std::endl;
     int candidates = G.size_LWCC() - prune_count, current = -1;
     std::vector<int> is_candidate(N, true);
     std::vector<int> eccentricity(N, 0), ecc_lower(N, 0), ecc_upper(N, N);
@@ -226,6 +237,11 @@ vector<int> bounding_eccentricities(const graph_type &G, int N, int STRATEGY,
         } else {
             current = select_from(STRATEGY, is_candidate, G, ecc_lower,
                                   ecc_upper, d, high, N);
+        }
+        if(current == -1)
+        {
+            continue;
+            candidates--;
         }
         // run a bfs fron the selected node
         d = ECCENTRICITY(G, current, N);
@@ -280,7 +296,7 @@ vector<int> bounding_eccentricities(const graph_type &G, int N, int STRATEGY,
         }
     }
 
-    std::cerr << "Number of iterations performed : " << number_of_iterations
+    std::cout << "Number of iterations performed : " << number_of_iterations
               << endl;
     return eccentricity;
 }

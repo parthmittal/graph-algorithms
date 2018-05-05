@@ -64,10 +64,11 @@ int main(int argc, const char **argv) {
         vert[e.second];
     }
 
+    printf("%d\n", graph.N);
     printf("%lu %lu\n", vert.size(), all_edges.size());
-    for (auto &e : all_edges) {
-        printf("%d %d\n", e.first, e.second);
-    }
+    // for (auto &e : all_edges) {
+    //     printf("%d %d\n", e.first, e.second);
+    // }
 }
 
 void dfs(const naive_graph_t<int> &graph, int node, int &timer) {

@@ -30,27 +30,36 @@ int main(int argc, const char **argv) {
     parser.addOption("-R", "--rv_algorithm");
 
     parser.parse(argc, argv);
-    auto graph = our::read_file(
-        "/home/kushagra/Desktop/6/IP/graph-algorithms/Email-Enron.txt", parser);
+    const string filename = argv[1];
+
+    cerr << filename << endl;
+    
+    our::naive_graph_t<int> graph = our::read_file(
+        filename, parser);
+
+    cout << "DATASET : ";
+    cout << filename << endl;
 
     our::naive_LWCC_t<int> naive_graph(graph.adj);
     our::LWCC_t<int> main_graph(graph.adj);
-    our::graph_t<int> temp_graph(graph.adj);
-    our::reduced_LWCC_t reduced_graph(
+    our::BCC_t biconnected_comp(graph);
+    our::graph_t<int> temp_graph(biconnected_comp.adj);
+    our::reduced_graph_t reduced_graph(
         temp_graph, our::ed_dfs::two_connected_prop(temp_graph));
+    reduced_graph.set_vert(biconnected_comp.vert);
 
     double time_taken;
     clock_t tStart;
 
     /* the bounding eccentricities algorithm */
     if (parser.checkIncluded("bounding_eccentricities")) {
-        cerr << "--------------------BOUNDING "
+        cout << "--------------------BOUNDING "
                 "ECCENTIRITIES-----------------------"
              << endl;
-        cerr << "=============================================================="
+        cout << "=============================================================="
                 "==="
              << endl;
-        cerr << "Graph type : Naive Graph" << endl;
+        cout << "Graph type : Naive Graph" << endl;
         tStart = clock();
         vector<int> b_eccentricity_naive;
         if (parser.checkIncluded("strategy_1"))
@@ -66,11 +75,11 @@ int main(int argc, const char **argv) {
         //            cout << i << " ";
         //        cout << endl;
         time_taken = (clock() - tStart) / (double)CLOCKS_PER_SEC;
-        cerr << "Time taken = " << time_taken << endl;
-        cerr << "=============================================================="
+        cout << "Time taken = " << time_taken << endl;
+        cout << "=============================================================="
                 "==="
              << endl;
-        cerr << "Graph type : CRS Graph" << endl;
+        cout << "Graph type : CRS Graph" << endl;
         tStart = clock();
         vector<int> b_eccentricity_crs;
         if (parser.checkIncluded("strategy_1"))
@@ -83,101 +92,113 @@ int main(int argc, const char **argv) {
             b_eccentricity_crs = our::bounding_eccentricities(
                 main_graph, main_graph.N, 3, parser);
         time_taken = (clock() - tStart) / (double)(double)CLOCKS_PER_SEC;
-        cerr << "Time taken = " << time_taken << endl;
-        cerr << "=============================================================="
+        cout << "Time taken = " << time_taken << endl;
+        cout << "=============================================================="
                 "==="
              << endl;
-        cerr << "--------------------------------------------------------------"
+        cout << "--------------------------------------------------------------"
                 "---"
              << endl;
 
-        cerr << "Graph type : Reduced Graph : Biconnected component" << endl;
-        tStart = clock();
-        vector<int> b_eccentricity_reduced;
-        if (parser.checkIncluded("strategy_1"))
-            b_eccentricity_reduced = our::bounding_eccentricities(
-                reduced_graph, reduced_graph.N, 1, parser);
-        else if (parser.checkIncluded("strategy_2"))
-            b_eccentricity_reduced = our::bounding_eccentricities(
-                reduced_graph, reduced_graph.N, 2, parser);
-        else if (parser.checkIncluded("strategy_3"))
-            b_eccentricity_reduced = our::bounding_eccentricities(
-                reduced_graph, reduced_graph.N, 3, parser);
-        time_taken = (clock() - tStart) / (double)(double)CLOCKS_PER_SEC;
-        cerr << "Time taken = " << time_taken << endl;
-        cerr << "=============================================================="
-                "==="
-             << endl;
-        cerr << "--------------------------------------------------------------"
-                "---"
-             << endl;
+        // cout << "Graph type : Reduced Graph : Biconnected component" << endl;
+        // tStart = clock();
+        // vector<int> b_eccentricity_reduced;
+        // if (parser.checkIncluded("strategy_1"))
+        //     b_eccentricity_reduced = our::bounding_eccentricities(
+        //         reduced_graph, reduced_graph.N, 1, parser);
+        // else if (parser.checkIncluded("strategy_2"))
+        //     b_eccentricity_reduced = our::bounding_eccentricities(
+        //         reduced_graph, reduced_graph.N, 2, parser);
+        // else if (parser.checkIncluded("strategy_3"))
+        //     b_eccentricity_reduced = our::bounding_eccentricities(
+        //         reduced_graph, reduced_graph.N, 3, parser);
+        // time_taken = (clock() - tStart) / (double)(double)CLOCKS_PER_SEC;
+        // cout << "Time taken = " << time_taken << endl;
+        // cout << "=============================================================="
+        //         "==="
+        //      << endl;
+        // cout << "--------------------------------------------------------------"
+        //         "---"
+        //      << endl;
     }
 
     /*  the k_bfs algorithm with k = 60*/
     if (parser.checkIncluded("k_bfs")) {
-        cerr << "-----------------------------K "
+        cout << "-----------------------------K "
                 "BFS-------------------------------"
              << endl;
-        cerr << "=============================================================="
+        cout << "=============================================================="
                 "==="
              << endl;
-        cerr << "Graph type : Naive Graph" << endl;
+        cout << "Graph type : Naive Graph" << endl;
         tStart = clock();
         vector<int> kbfs_eccentricity_naive =
             our::k_bfs(naive_graph, 60, naive_graph.N);
-        for (auto &i : kbfs_eccentricity_naive)
-            cout << i << " ";
-        cout << endl;
+        // for (auto &i : kbfs_eccentricity_naive)
+        //     cout << i << " ";
+        // cout << endl;
         time_taken = (clock() - tStart) / (double)CLOCKS_PER_SEC;
-        cerr << "Time taken = " << time_taken << endl;
-        cerr << "=============================================================="
+        cout << "Time taken = " << time_taken << endl;
+        cout << "=============================================================="
                 "==="
              << endl;
-        cerr << "Graph type : CRS Graph" << endl;
+        cout << "Graph type : CRS Graph" << endl;
         tStart = clock();
         vector<int> kbfs_eccentricity_crs =
             our::k_bfs(main_graph, 60, main_graph.N);
         time_taken = (clock() - tStart) / (double)CLOCKS_PER_SEC;
-        cerr << "Time taken = " << time_taken << endl;
-        cerr << "=============================================================="
+        cout << "Time taken = " << time_taken << endl;
+        cout << "=============================================================="
                 "==="
              << endl;
-        cerr << "--------------------------------------------------------------"
+        cout << "=============================================================="
+                "==="
+             << endl;
+        cout << "Graph type : Reduced Graph" << endl;
+        tStart = clock();
+        vector<int> kbfs_eccentricity_reduced =
+            our::k_bfs(reduced_graph, 60, reduced_graph.N);
+        time_taken = (clock() - tStart) / (double)CLOCKS_PER_SEC;
+        cout << "Time taken = " << time_taken << endl;
+        cout << "=============================================================="
+                "==="
+             << endl;
+        cout << "--------------------------------------------------------------"
                 "---"
              << endl;
     }
 
     /*  the RV algorithm */
     if (parser.checkIncluded("rv_algorithm")) {
-        cerr << "------------------------------RV------------------------------"
+        cout << "------------------------------RV------------------------------"
                 "---"
              << endl;
-        cerr << "=============================================================="
+        cout << "=============================================================="
                 "==="
              << endl;
-        cerr << "Graph type : Naive Graph" << endl;
+        cout << "Graph type : Naive Graph" << endl;
         int s = 2 * sqrt(naive_graph.N) * log(naive_graph.N);
         tStart = clock();
         vector<int> rv_eccentricity_naive =
             our::RV_algorithm(naive_graph, naive_graph.N, s);
-        for (auto &i : rv_eccentricity_naive)
-            cout << i << " ";
-        cout << endl;
+        // for (auto &i : rv_eccentricity_naive)
+        //     cout << i << " ";
+        // cout << endl;
         time_taken = (clock() - tStart) / (double)CLOCKS_PER_SEC;
-        cerr << "Time taken = " << time_taken << endl;
-        cerr << "=============================================================="
+        cout << "Time taken = " << time_taken << endl;
+        cout << "=============================================================="
                 "==="
              << endl;
-        cerr << "Graph type : CRS Graph" << endl;
+        cout << "Graph type : CRS Graph" << endl;
         tStart = clock();
         vector<int> rv_eccentricity_crs =
             our::RV_algorithm(main_graph, main_graph.N, s);
         time_taken = (clock() - tStart) / (double)CLOCKS_PER_SEC;
-        cerr << "Time taken = " << time_taken << endl;
-        cerr << "=============================================================="
+        cout << "Time taken = " << time_taken << endl;
+        cout << "=============================================================="
                 "==="
              << endl;
-        cerr << "--------------------------------------------------------------"
+        cout << "--------------------------------------------------------------"
                 "---"
              << endl;
     }
@@ -189,8 +210,8 @@ int main(int argc, const char **argv) {
     //        vector<int> D = our::ECCENTRICITY(naive_graph, i, naive_graph.N);
     // }
     // time_taken = (clock() - tStart) / (double)CLOCKS_PER_SEC;
-    // cerr << "Time taken = " << time_taken << endl;
-    // cerr << "=============================================================="
+    // cout << "Time taken = " << time_taken << endl;
+    // cout << "=============================================================="
     //         "==="
     //      << endl;
 
@@ -201,8 +222,8 @@ int main(int argc, const char **argv) {
     //         vector<int> D = our::ECCENTRICITY(main_graph, i, main_graph.N);
     // }
     // time_taken = (clock() - tStart) / (double)CLOCKS_PER_SEC;
-    // cerr << "Time taken = " << time_taken << endl;
-    // cerr << "=============================================================="
+    // cout << "Time taken = " << time_taken << endl;
+    // cout << "=============================================================="
     //         "==="
     //      << endl;
     return 0;

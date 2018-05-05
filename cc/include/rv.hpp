@@ -14,6 +14,7 @@ void bfs(int source, int root, const graph_type &G,
          std::vector<std::vector<int>> &dist,
          std::vector<std::vector<int>> &visited, std::vector<int> &eccentricity,
          bool update_eccentricity) {
+    // std::cerr << "started with " << root << endl;
     dist[root][source] = 0;
     if (update_eccentricity)
         eccentricity[source] =
@@ -26,6 +27,7 @@ void bfs(int source, int root, const graph_type &G,
         q.pop();
         for (auto &i : G[u]) {
             if (!visited[root][i]) {
+                visited[root][i] = true;
                 dist[root][i] = dist[root][u] + 1;
                 if (update_eccentricity)
                     eccentricity[i] = std::max(eccentricity[i], dist[root][i]);
@@ -33,6 +35,7 @@ void bfs(int source, int root, const graph_type &G,
             }
         }
     }
+    // std::cerr << "Done with " << root << endl;
 }
 
 template <typename graph_type>
@@ -40,7 +43,7 @@ std::vector<int> modified_bfs(int source, const graph_type &G,
                               std::vector<int> &dist, std::vector<int> &visited,
                               std::vector<int> &eccentricity,
                               std::set<int> &Ns_w, int s, int N) {
-    std::vector<int> parent;
+    std::vector<int> parent(N);
     std::vector<int> closest_on_path(N);
     dist[source] = 0;
     eccentricity[source] = std::max(eccentricity[source], dist[source]);
@@ -93,7 +96,7 @@ std::vector<int> RV_algorithm(const graph_type &G, int N, int s) {
             temp_sample.insert(a);
         }
     }
-    std::cerr << s << " vertices sampled" << endl;
+    // std::cerr << s << " vertices sampled" << endl;
     for (auto &i : temp_sample) {
         sampled_vertices.push_back(i);
         found[i] = true;
@@ -104,8 +107,10 @@ std::vector<int> RV_algorithm(const graph_type &G, int N, int s) {
     std::vector<std::vector<int>> dist(s + 1, std::vector<int>(N, inf));
     std::vector<std::vector<int>> visited(s + 1, std::vector<int>(N, false));
     std::vector<int> eccentricity(N, 0);
+    std::cerr << "s = " << s << endl;
     for (int i = 0; i < s; i++) {
         bfs(sampled_vertices[i], i, G, dist, visited, eccentricity, true);
+        // std::cerr << i << "th bfs complete and s = " << s << endl;
     }
 
     int max_distance = 0;
@@ -130,22 +135,29 @@ std::vector<int> RV_algorithm(const graph_type &G, int N, int s) {
     }
 
     std::set<int> Ns_w;
+    // std::cerr << "starting modified_bfs" << endl;
     std::vector<int> closest_on_path =
         modified_bfs(w, G, dist[s], visited[s], eccentricity, Ns_w, s - 1, N);
     eccentricity[w] = *std::max_element(dist[s].begin(), dist[s].end());
-
+    // std::cerr << "modified_bfs complete" << endl;
     for (int i = 0; i < s; i++) {
         std::fill(dist[i].begin(), dist[i].end(), -1);
         std::fill(visited[i].begin(), visited[i].end(), false);
     }
 
+    // cout << "size of Ns_w : " << Ns_w.size() << endl;
     std::map<int, int> key;
     int root = 0;
     for (auto &i : Ns_w) {
         found[i] = true;
         key[i] = root;
-        bfs(i, root++, G, dist, visited, eccentricity, false);
-        eccentricity[i] = *std::max_element(dist[i].begin(), dist[i].end());
+        // std::cerr << "performing bfs on " << i << endl;
+        bfs(i, root, G, dist, visited, eccentricity, false);
+        // std::cerr << root << "th bfs complete and size of Ns_w is " << Ns_w.size() << endl;
+        // std::cerr << "marking eccentricity of " << i << endl;
+        eccentricity[i] = *std::max_element(dist[root].begin(), dist[root].end());
+        // std::cerr << "eccentricity of " << i << " =  " << eccentricity[i] << endl;
+        root++;
     }
 
     for (int i = 0; i < N; i++) {
