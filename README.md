@@ -10,7 +10,7 @@ For Production code:
 2. Compile all changes using make command : `make`
 
 ### Running the program
-`Release/cc/cc_exec <path_to_input_file> <option_list>
+`Release/cc/cc_exec <path_to_input_file> <option_list>`
 
 ### Options
 1. -v, --vertex_count : if the input file contains number of vertices and edges
@@ -22,3 +22,6 @@ For Production code:
 7. -B, --bounding_eccentricities : if you want to run bounding eccentricities algorithm
 8. -K, --k_bfs : if you want to run the K bfs algorithm algorithm
 9. -R, --rv_algorithm : if you want to run the RV algorithm
+
+### Example
+`Release/cc/cc_exec ../../data/Email-Enron.txt -b -p -B -K -R`
