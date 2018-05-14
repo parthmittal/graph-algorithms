@@ -71,7 +71,7 @@ int main(int argc, const char **argv) {
 		auto finish = chrono::steady_clock::now();
 		auto int_ms = chrono::duration_cast<chrono::milliseconds>(finish - start);
 
-		cerr << "computed betweenness centrality in"
+		cerr << "computed betweenness centrality in "
 			<< int_ms.count() << " milliseconds" << endl;
 
 		for (int i = 0; i < graph.N; ++i) {
@@ -86,7 +86,7 @@ int main(int argc, const char **argv) {
 		auto finish = chrono::steady_clock::now();
 		auto int_ms = chrono::duration_cast<chrono::milliseconds>(finish - start);
 
-		cerr << "computed betweenness centrality in"
+		cerr << "computed betweenness centrality in "
 			<< int_ms.count() << " milliseconds" << endl;
 
 		for (int i = 0; i < graph.N; ++i) {
