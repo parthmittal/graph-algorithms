@@ -262,7 +262,7 @@ void bwc_our::sim_brandes_all() {
 
             for (auto &e : Gr[u]) {
                 int v = e.v;
-                if (vis[v] == 0 && Gr.sig[v] && !e.vids.empty()) {
+                if (vis[v] == 0 && !e.vids.empty()) {
                     /* the dry run simulates the allocations we'd make */
                     bfq.push(v);
                     vis[v] = 1;
@@ -303,7 +303,7 @@ void bwc_our::sim_brandes_all() {
     for (int root = 0; root < Gr.N; ++root) {
         if (!Gr.sig[root]) {
 
-            if (config.checkIncluded("d")) {
+            if (!config.checkIncluded("d")) {
                 assert(!vis[root]);
                 assert(!done[Gr.rid[root]]);
                 /* instead of simulating for this , just run Brandes Algorithm
