@@ -27,6 +27,7 @@ int main(int argc, const char **argv) {
 
     config.addOption("-d", "--dry-run");
 	config.addOption("-b", "--use-brandes");
+    config.addOption("-s", "--insig-dijkstra");
     config.parse(argc - 1, argv);
 
     auto graph_tmp = read_file(filename, config);

@@ -302,13 +302,19 @@ void bwc_our::sim_brandes_all() {
 
     for (int root = 0; root < Gr.N; ++root) {
         if (!Gr.sig[root]) {
-
             if (!config.checkIncluded("d")) {
                 assert(!vis[root]);
                 assert(!done[Gr.rid[root]]);
-                /* instead of simulating for this , just run Brandes Algorithm
-                 */
-                brandes::bwc1(G, Gr.rid[root], bwc);
+                if (!config.checkIncluded("s")) {
+                    /* instead of simulating for this , just run Brandes
+                     * Algorithm
+                     */
+                    brandes::bwc1(G, Gr.rid[root], bwc);
+                } else {
+                    info[root] = get_node_info(root);
+                    sim_brandes1(Gr.rid[root], *info[root], *info[root]);
+                    info[root].reset();
+                }
             }
         }
     }
