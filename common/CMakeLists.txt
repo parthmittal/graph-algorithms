@@ -1,7 +1,12 @@
 project(CommonStuff)
 
-# define SOURCES to hold all .cpp files in src
-file(GLOB SOURCES "src/*.cpp")
+set(SOURCES src/ed-dfs.cpp
+            src/graph.cpp
+            src/reduced_graph.cpp
+            src/compress.cpp
+            src/config.cpp
+            src/graph_reader.cpp
+            src/optparser.cpp)
 
 # generate static library from sources
 add_library(common STATIC ${SOURCES})

@@ -2,7 +2,10 @@
 project(BetweennessCentrality)
 
 # define SOURCES to hold all .cpp files in src
-file(GLOB SOURCES "src/*.cpp")
+set(SOURCES src/bwc_our.cpp
+            src/count_sort.cpp
+            src/sssp.cpp
+            src/brandes.cpp)
 
 # generate static library from sources
 add_library(bwc STATIC ${SOURCES})

@@ -9,8 +9,7 @@
 namespace our {
 
 struct queue_element_t {
-    int dist;
-    int parent, node;
+    int dist, node;
 
     bool operator>(const queue_element_t &other) const {
         return (dist > other.dist);
@@ -33,29 +32,26 @@ void sssp(int source, const reduced_graph_t &G, std::vector<int> &S,
 
     dist[source] = 0;
     num_paths[source] = 1;
-    dfq.push({0, -1, source});
+    dfq.push({0, source});
 
     while (!dfq.empty()) {
         auto curr = dfq.top();
         dfq.pop();
 
-        if (curr.dist == dist[curr.node]) {
-            /* this is a shortest path to curr.node */
-            if (curr.parent != -1) {
-                num_paths[curr.node] += num_paths[curr.parent];
-            }
-
-            /* have we relaxed edges leaving curr.node? */
-            if (!popped[curr.node]) {
-                popped[curr.node] = 1;
-                S.push_back(curr.node);
-                for (auto &e : G[curr.node]) {
-                    int targ = e.v;
-                    int weight = dist[curr.node] + e.weight;
-                    if (dist[targ] == -1 || weight <= dist[targ]) {
-                        dist[targ] = weight;
-                        dfq.push({weight, curr.node, targ});
-                    }
+        /* have we relaxed edges leaving curr.node? */
+        if (!popped[curr.node]) {
+            popped[curr.node] = 1;
+            S.push_back(curr.node);
+            for (auto &e : G[curr.node]) {
+                int targ = e.v;
+                int weight = dist[curr.node] + e.weight;
+                if (dist[targ] == -1 || weight < dist[targ]) {
+                    dist[targ] = weight;
+                    num_paths[targ] = 0;
+                    dfq.push({weight, targ});
+                }
+                if (dist[targ] == weight) {
+                    num_paths[targ] += num_paths[curr.node];
                 }
             }
         }
