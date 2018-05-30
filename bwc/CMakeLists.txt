@@ -5,7 +5,9 @@ project(BetweennessCentrality)
 set(SOURCES src/bwc_our.cpp
             src/count_sort.cpp
             src/sssp.cpp
-            src/brandes.cpp)
+            src/brandes.cpp
+            src/skeleton_sdm.cpp
+            src/split_graph.cpp)
 
 # generate static library from sources
 add_library(bwc STATIC ${SOURCES})
