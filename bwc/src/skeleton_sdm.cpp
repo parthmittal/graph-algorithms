@@ -1,13 +1,14 @@
-#include <vector>
 #include <queue>
+#include <vector>
 
 #include <graph.hpp>
 #include <skeleton_sdm.hpp>
 
 using namespace std;
 
+namespace our {
 namespace sdm {
-sk_hack_t::sk_hack_t(const our::graph_t<int> &G, const vector<int> &P)
+sk_hack_t::sk_hack_t(const graph_t<int> &G, const vector<int> &P)
     : P(P), G(G), id(G.N, -1) {
     for (int u = 0; u < G.N; ++u) {
         for (const int &v : G[u]) {
@@ -53,7 +54,7 @@ void sk_hack_t::add_sp_edges(int source) {
     dist[source] = 0;
     mult[source] = 1;
 
-    while(!bfq.empty()) {
+    while (!bfq.empty()) {
         int u = bfq.front();
         bfq.pop();
         for (const int &v : G[u]) {
@@ -79,4 +80,5 @@ void sk_hack_t::add_sp_edges(int source) {
         }
     }
 }
-}; // namespace sdm
+} // namespace sdm
+} // namespace our
