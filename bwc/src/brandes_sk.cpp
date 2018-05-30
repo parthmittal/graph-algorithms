@@ -13,14 +13,25 @@ struct queue_element_t {
     }
 };
 
+void brandes_skone(const split_graph_t &G, std::vector<int> source,
+                   std::vector<int> dest, std::vector<double> bc) {
+}
+
 std::vector<double> brandes_skall(const sk_graph_t<int> &G,
                                   std::vector<int> dest,
                                   std::vector<double> &bc) {
     using namespace std;
     stack<int> S;
 
+    split_graph_t split(G);
+
     for (int i = 0; i < part.size(); ++i) {
         for (int j = 0; j < part.size(); ++j) {
+            split.active[i] = 1;
+            split.active[j] = 1;
+
+            split.active[i] = 0;
+            split.active[i] = 0;
         }
     }
 
