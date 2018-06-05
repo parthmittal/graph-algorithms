@@ -7,6 +7,7 @@ set(SOURCES src/bwc_our.cpp
             src/sssp.cpp
             src/brandes.cpp
             src/skeleton_sdm.cpp
+            src/brandes_sk.cpp
             src/split_graph.cpp)
 
 # generate static library from sources

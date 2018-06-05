@@ -6,7 +6,7 @@
 
 namespace our {
 namespace sdm {
-int split_graph_t::adj_size(int u) {
+int split_graph_t::adj_size(int u) const {
     int pid = skeleton.P[u];
 
     if (active[pid]) { /* partition containing u is "active" */
@@ -18,7 +18,7 @@ int split_graph_t::adj_size(int u) {
     }
 }
 
-wm_edge_t split_graph_t::get_edge(int u, int i) {
+wm_edge_t split_graph_t::get_edge(int u, int i) const {
     int pid = skeleton.P[u];
 
     if (active[pid]) {
