@@ -15,7 +15,7 @@ struct wm_edge_t {
 
 struct sk_hack_t {
     std::vector<std::vector<wm_edge_t>> adj;
-    std::vector<int> id, rid;
+    std::vector<bool> is_frontier;
 
     const graph_t<int> &G;
     const std::vector<int> &P; /* P[i] <- partition id of  i */

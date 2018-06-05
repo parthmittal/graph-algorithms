@@ -8,12 +8,11 @@ namespace our {
 namespace sdm {
 int split_graph_t::adj_size(int u) {
     int pid = skeleton.P[u];
-    int fid = skeleton.id[u];
 
     if (active[pid]) { /* partition containing u is "active" */
         return G[u].size();
-    } else if (fid != -1) { /* u is a frontier */
-        return skeleton[fid].size();
+    } else if (skeleton.is_frontier[u]) {
+        return skeleton[u].size();
     } else {
         return 0;
     }
@@ -21,13 +20,11 @@ int split_graph_t::adj_size(int u) {
 
 wm_edge_t split_graph_t::get_edge(int u, int i) {
     int pid = skeleton.P[u];
-    int fid = skeleton.id[u];
 
     if (active[pid]) {
-        assert(i < G[u].size());
         return {G[u][i], 1, 1};
-    } else if (fid != -1) {
-        return skeleton[fid][i];
+    } else if (skeleton.is_frontier[u]) {
+        return skeleton[u][i];
     } else {
         exit(-1);
     }
