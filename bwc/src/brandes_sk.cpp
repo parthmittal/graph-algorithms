@@ -67,21 +67,53 @@ void brandes_skone(const split_graph_t &G, int source,
                             (is_dest[v] + delta[v]);
             }
         }
+    }
 
-        if (v != source) {
-            bc[v] += delta[v];
+    const auto &sk = G.skeleton;
+    for (int p = 0; p < sk.part.size(); ++p) {
+        if (!G.active[p]) {
+            /* find frontier barrier */
+            int F = 0;
+            for (; F < sk.part[p].size() && sk.is_frontier[sk.rid[p][F]]; ++F)
+                ;
+
+            for (int v = F; v < sk.part[p].size(); ++v) {
+                int va = sk.rid[p][v];
+                int min_dist = 1e9, sigma = 0;
+                for (int f = 0; f < F; ++f) {
+                    int fa = sk.rid[p][f];
+                    if (dist[fa] + sk.pDist[p][f][v] < min_dist) {
+                        min_dist = dist[fa] + sk.pDist[p][f][v];
+                        sigma = 0;
+                    }
+                    if (dist[fa] + sk.pDist[p][f][v] == min_dist) {
+                        sigma += num_paths[f] * sk.pNPaths[p][f][v];
+                    }
+                }
+                for (int f = 0; f < F; ++f) {
+                    int fa = sk.rid[p][f];
+                    if (dist[f] == sk.pDist[p][f][v] + min_dist) {
+                        delta[va] += sigma / double(num_paths[f]) *
+                                     sk.pNPaths[p][f][v] * delta[fa];
+                    }
+                }
+            }
         }
+    }
+
+    for (int v = 0; v < G.N; ++v) {
+        bc[v] += delta[v];
     }
 }
 
-std::vector<double> brandes_skall(const sk_graph_t &G, std::vector<int> dest,
-                                  std::vector<double> &bc) {
+std::vector<double> brandes_skall(const sk_graph_t &G) {
     using namespace std;
     stack<int> S;
 
     split_graph_t split(G);
 
     vector<bool> is_dest(G.N);
+    vector<double> bc(G.N);
     for (int i = 0; i < G.part.size(); ++i) {
         for (int j = 0; j < G.part.size(); ++j) {
             split.active[i] = 1;
@@ -93,6 +125,11 @@ std::vector<double> brandes_skall(const sk_graph_t &G, std::vector<int> dest,
 
             /******** SETUP COMPLETE ***********/
 
+            for (int si = 0; si < G.part[i].size(); ++si) {
+                int s = G.rid[i][si];
+                brandes_skone(split, s, is_dest, bc);
+            }
+
             /******** CLEANUP BEGINS ***********/
 
             for (int v : G.part[j]) {
@@ -103,6 +140,8 @@ std::vector<double> brandes_skall(const sk_graph_t &G, std::vector<int> dest,
             split.active[i] = 0;
         }
     }
+
+    return bc;
 }
 } // namespace sdm
 } // namespace our

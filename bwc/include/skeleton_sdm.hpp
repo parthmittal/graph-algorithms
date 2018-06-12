@@ -20,7 +20,13 @@ struct sk_hack_t {
     const graph_t<int> &G;
     const std::vector<int> &P; /* P[i] <- partition id of  i */
     std::vector<std::vector<int>>
-        part; /* part[i] <- vector containing all x s.t P[x] = i */
+        part;            /* part[i] <- vector containing all x s.t P[x] = i */
+    std::vector<int> id; /* id of vertex within its partition */
+    std::vector<std ::vector<int>> rid;
+    std::vector<std::vector<std::vector<int>>> pDist, pNPaths;
+    /* for each frontier within each partition, store the distance
+     * of all other nodes within the partition.
+     * possible TODO: replace w/ a dynamic matrix type? */
 
     /* we need these to do BFS efficiently; they represent nothing in final
      * graph */
