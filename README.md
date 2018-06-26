@@ -1,11 +1,11 @@
 # Closeness Centrality
 ---
 ### Compilation
-For Debugging :
+*For Debugging :*
 1. Go to Debug Folder : `cd Debug`
 2. Compile all changes using make command : `make`
 
-For Production code:
+*For Production code:*
 1. Go to the Release Folder : `cd Release`
 2. Compile all changes using make command : `make`
 
