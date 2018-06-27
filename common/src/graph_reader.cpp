@@ -19,15 +19,16 @@ naive_graph_t<int> read_file(const std::string &filename, OptParser &parser) {
     cerr << "Filename: " << filename << endl;
     ifstream input_graph(filename);
     string text_line;
-    if (parser.checkIncluded("vertex_count")) {
+    if (parser.checkIncluded("no-count") != 1) {
         input_graph >> vertex_count >> edge_count;
     }
 
     set<int> vertex_list;
     vector<pair<int, int>> edge_list;
 
-    int u, v;
-    while (input_graph >> u >> v) {
+    while (edge_count--) {
+        int u, v;
+        input_graph >> u >> v;
         vertex_list.insert(u);
         vertex_list.insert(v);
         edge_list.push_back({u, v});
