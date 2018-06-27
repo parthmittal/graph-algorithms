@@ -99,6 +99,9 @@ void sk_hack_t::add_sp_edges(int source) {
     }
 
     for (const int &v : part[pid]) {
+        if (v == source) {
+            continue;
+        }
         if (dist[v] < G.N + 1 && is_frontier[v]) {
             adj[source].push_back({v, dist[v], mult[v]});
         } else {

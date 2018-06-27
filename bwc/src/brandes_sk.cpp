@@ -39,6 +39,7 @@ void brandes_skone(const split_graph_t &G, int source,
         if (!popped[u]) {
             popped[u] = 1;
             S.push(u);
+
             for (int i = 0; i < G.adj_size(u); ++i) {
                 auto e = G.get_edge(u, i);
                 int v = e.v;
@@ -88,14 +89,19 @@ void brandes_skone(const split_graph_t &G, int source,
                         sigma = 0;
                     }
                     if (dist[fa] + sk.pDist[p][f][v] == min_dist) {
-                        sigma += num_paths[f] * sk.pNPaths[p][f][v];
+                        sigma += num_paths[fa] * sk.pNPaths[p][f][v];
                     }
                 }
                 for (int f = 0; f < F; ++f) {
                     int fa = sk.rid[p][f];
-                    if (dist[f] == sk.pDist[p][f][v] + min_dist) {
-                        delta[va] += sigma / double(num_paths[f]) *
+                    if (dist[fa] == sk.pDist[p][f][v] + min_dist) {
+                        double old = delta[va];
+                        delta[va] += sigma / double(num_paths[fa]) *
                                      sk.pNPaths[p][f][v] * delta[fa];
+
+                        if (va == 19 && old != delta[va]) {
+                            int a = 5;
+                        }
                     }
                 }
             }
@@ -104,6 +110,9 @@ void brandes_skone(const split_graph_t &G, int source,
 
     for (int v = 0; v < G.N; ++v) {
         if (v != source) {
+            if (v == 19 && delta[v] != 0) {
+                int a = 5;
+            }
             bc[v] += delta[v];
         }
     }
@@ -134,6 +143,7 @@ std::vector<double> brandes_skall(const sk_graph_t &G) {
             }
 
             /******** CLEANUP BEGINS ***********/
+            cerr << i << ' ' << j << " done" << endl;
 
             for (int v : G.part[j]) {
                 is_dest[v] = false;
@@ -142,6 +152,8 @@ std::vector<double> brandes_skall(const sk_graph_t &G) {
             split.active[i] = 0;
             split.active[i] = 0;
         }
+
+        cerr << i << " done" << endl;
     }
 
     return bc;
