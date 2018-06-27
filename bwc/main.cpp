@@ -1,6 +1,8 @@
 #include <chrono>
+#include <cstdlib>
 #include <iomanip>
 #include <iostream>
+#include <fstream>
 
 #include <brandes.hpp>
 #include <brandes_sk.hpp>
@@ -88,17 +90,22 @@ int main(int argc, const char **argv) {
         cerr << "computing BC using brandes++ algorithm" << endl;
         cerr << "==================================================" << endl;
 
-        vector<int> P = graph_tmp.P;
+        auto start = chrono::steady_clock::now();
 
-        cerr << "I/O done" << endl;
+        vector<int> P = graph_tmp.P;
 
         sdm::sk_graph_t skeleton(graph, P);
 
-        cerr << "constructed skeleton" << endl;
-
-        cerr << "==================================================" << endl;
 
         auto bwc = sdm::brandes_skall(skeleton);
+
+        auto finish = chrono::steady_clock::now();
+        auto int_ms =
+            chrono::duration_cast<chrono::milliseconds>(finish - start);
+
+        cerr << "computed betweenness centrality in " << int_ms.count()
+             << " milliseconds" << endl;
+        cerr << "==================================================" << endl;
 
         for (int i = 0; i < graph.N; ++i) {
             cout << bwc[i] << '\n';
