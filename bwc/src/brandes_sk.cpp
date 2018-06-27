@@ -49,7 +49,7 @@ void brandes_skone(const split_graph_t &G, int source,
                     dfq.push({weight, v});
                 }
                 if (weight == dist[v]) {
-                    num_paths[v] += num_paths[v] * e.mult;
+                    num_paths[v] += num_paths[u] * e.mult;
                 }
             }
         }
@@ -59,6 +59,7 @@ void brandes_skone(const split_graph_t &G, int source,
 
     while (!S.empty()) {
         int v = S.top();
+        S.pop();
         for (int i = 0; i < G.adj_size(v); ++i) {
             auto e = G.get_edge(v, i);
             int w = e.v;
@@ -102,7 +103,9 @@ void brandes_skone(const split_graph_t &G, int source,
     }
 
     for (int v = 0; v < G.N; ++v) {
-        bc[v] += delta[v];
+        if (v != source) {
+            bc[v] += delta[v];
+        }
     }
 }
 

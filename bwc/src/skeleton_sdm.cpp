@@ -9,7 +9,7 @@ using namespace std;
 namespace our {
 namespace sdm {
 sk_hack_t::sk_hack_t(const graph_t<int> &G, const vector<int> &P)
-    : P(P), G(G), adj(G.N), is_frontier(G.N) {
+    : P(P), G(G), adj(G.N), is_frontier(G.N), id(G.N) {
     int mxP = 0;
     for (int u = 0; u < G.N; ++u) {
         mxP = max(mxP, P[u]);
@@ -51,6 +51,7 @@ sk_hack_t::sk_hack_t(const graph_t<int> &G, const vector<int> &P)
         if (!is_frontier[u]) {
             int p = P[u];
             id[u] = cnt[p]++;
+            rid[p].push_back(u);
         }
     }
 

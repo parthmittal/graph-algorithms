@@ -14,10 +14,15 @@ namespace our {
 
 template <typename edge_t> struct naive_graph_t {
     std::vector<std::vector<edge_t>> adj;
+    std::vector<int> P;
     int N;
 
     naive_graph_t(const std::vector<std::vector<edge_t>> &adj)
         : adj(adj), N(adj.size()) {}
+
+    naive_graph_t(const std::vector<std::vector<edge_t>> &adj,
+                  std::vector<int> P)
+        : adj(adj), N(adj.size()), P(P) {}
 
     const std::vector<edge_t> &operator[](int u) const {
 #ifdef DEBUG

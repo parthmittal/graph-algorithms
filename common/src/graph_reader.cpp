@@ -42,6 +42,15 @@ naive_graph_t<int> read_file(const std::string &filename, OptParser &parser) {
         if (!(parser.checkIncluded("is_directed") == 1))
             adj[key[e.second]].push_back(key[e.first]);
     }
-    return {adj};
+
+    if (parser.checkIncluded("brandes-pp") == 1) {
+        vector<int> P(vertex_count);
+        for (int i = 0; i < vertex_count; ++i) {
+            input_graph >> P[i];
+        }
+        return {adj, P};
+    } else {
+        return {adj};
+    }
 }
 } // namespace our
