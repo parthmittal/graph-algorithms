@@ -7,8 +7,8 @@
 
 echo USAGE: num_tests num_vertices p
 
-TRUE="bwc/bwc_exec -b"
-CHECK="bwc/bwc_exec"
+TRUE="../bwc/bwc_exec -b"
+CHECK="../bwc/bwc_exec"
 TESTS=$1
 N=$2
 p=$3
@@ -16,11 +16,13 @@ p=$3
 for i in {1..$TESTS}
 do
     ./generator $N $p > graph.txt
-    $TRUE < graph.txt > true
-    $CHECK < graph.txt > check
-    DIFF=$(diff true check)
-    if [ "$DIFF" != "" ]
-        echo "Failed Test #$i, failing test written to graph.txt"
+    ./l2cc < graph.txt > graph.l2cc
+    $TRUE < graph.l2cc > true
+    $CHECK < graph.l2cc > check
+    if ./rcmp6 graph.l2cc check true 2> diffout ; then
+        echo "Test [$i] ok"
+    else
+        echo "Test [$i] FAILED, check graph.txt, diffout"
         exit 1
     fi
 done
