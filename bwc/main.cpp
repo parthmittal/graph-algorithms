@@ -22,20 +22,13 @@ int main(int argc, const char **argv) {
     using namespace std;
     using namespace our;
 
-    if (argc < 2) {
-        cerr << "need filename to read graph from" << endl;
-        exit(1);
-    }
-
-    const string filename = argv[argc - 1];
-
     config.addOption("-d", "--dry-run");
     config.addOption("-b", "--use-brandes");
     config.addOption("-s", "--insig-dijkstra");
     config.addOption("-p", "--brandes-pp");
-    config.parse(argc - 1, argv);
+    config.parse(argc, argv);
 
-    auto graph_tmp = read_file(filename, config);
+    auto graph_tmp = read_file(cin, config);
     graph_t<int> graph = graph_t<int>(graph_tmp.adj);
 
     //    ed_dfs::two_connected_prop ed_wrapper(graph);

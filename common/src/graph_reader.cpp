@@ -10,17 +10,15 @@
 #include <graph_reader.hpp>
 
 namespace our {
-naive_graph_t<int> read_file(const std::string &filename, OptParser &parser) {
+naive_graph_t<int> read_file(std::istream &in, OptParser &parser) {
     /* it's safe to use namespace within a function */
     using namespace std;
 
     int vertex_count = 0;
     int edge_count = 0;
-    cerr << "Filename: " << filename << endl;
-    ifstream input_graph(filename);
     string text_line;
     if (parser.checkIncluded("no-count") != 1) {
-        input_graph >> vertex_count >> edge_count;
+        in >> vertex_count >> edge_count;
     }
 
     set<int> vertex_list;
@@ -28,7 +26,7 @@ naive_graph_t<int> read_file(const std::string &filename, OptParser &parser) {
 
     while (edge_count--) {
         int u, v;
-        input_graph >> u >> v;
+        in >> u >> v;
         vertex_list.insert(u);
         vertex_list.insert(v);
         edge_list.push_back({u, v});
@@ -47,7 +45,7 @@ naive_graph_t<int> read_file(const std::string &filename, OptParser &parser) {
     if (parser.checkIncluded("brandes-pp") == 1) {
         vector<int> P(vertex_count);
         for (int i = 0; i < vertex_count; ++i) {
-            input_graph >> P[i];
+            in >> P[i];
         }
         return {adj, P};
     } else {

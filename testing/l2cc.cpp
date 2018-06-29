@@ -27,16 +27,9 @@ void store_bcc(int u, int v);
 int main(int argc, const char **argv) {
     using namespace std;
 
-    if (argc < 2) {
-        fprintf(stderr, "need abs path to path to read graph from\n");
-        exit(0);
-    }
-
-    const string filename = argv[1];
-
     our::OptParser parser;
 
-    auto graph = our::read_file(filename, parser);
+    auto graph = our::read_file(cin, parser);
 
     if (graph.N > max_N) {
         fprintf(stderr, "graph too big, I too lazy\n");

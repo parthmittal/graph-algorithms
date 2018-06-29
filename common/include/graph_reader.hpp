@@ -7,7 +7,7 @@
 #define __GRAPH_READER_hpp__
 
 namespace our {
-naive_graph_t<int> read_file(const std::string &filename, OptParser &parser);
+naive_graph_t<int> read_file(std::istream &in, OptParser &parser);
 } // namespace our
 
 #endif
