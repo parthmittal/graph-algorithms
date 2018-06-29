@@ -1,6 +1,4 @@
-build
 *.swp
-*.txt
 Debug
 Release
 output_files
