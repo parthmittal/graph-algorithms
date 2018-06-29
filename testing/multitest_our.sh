@@ -1,6 +1,6 @@
 #!/bin/bash
 # This script is used to test our algorithm to compute betweenness centrality
-# (bwc/bwc_exec);
+# (bwc/bwc_exec), on multiple randomly generated test cases.
 # For model output we use Brandes algorithm (bwc/bwc_exec -b)
 # NB: __don't__ use this in the directory testing in the repo root, instead
 # use the copy created by make in Release/testing.

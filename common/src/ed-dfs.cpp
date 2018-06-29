@@ -1,5 +1,6 @@
 #include <ed-dfs.hpp>
 #include <graph.hpp>
+#include <optparser.hpp>
 
 #include <cassert>
 #include <chrono>
@@ -116,8 +117,10 @@ void two_connected_prop::bring_largest_front() {
             sz_max = sz;
         }
     }
-    fprintf(stderr, "largest bcc has (%d) vertices ~ %0.2F percent\n", sz_max,
-            100 * sz_max / double(G.N));
+    if (config.checkIncluded("verbose")) {
+        fprintf(stderr, "largest bcc has (%d) vertices ~ %0.2F percent\n",
+                sz_max, 100 * sz_max / double(G.N));
+    }
 }
 } // namespace ed_dfs
 } // namespace our
