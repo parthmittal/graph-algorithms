@@ -21,8 +21,8 @@ struct queue_element_t {
 void brandes_skone(const split_graph_t &G, int source,
                    const std::vector<bool> &is_dest, std::vector<double> &bc) {
     using namespace std;
-    vector<int> dist(G.N, -1), num_paths(G.N);
-    vector<bool> popped(G.N);
+    static vector<int> dist(G.N, -1), num_paths(G.N);
+    static vector<bool> popped(G.N);
 
     typedef queue_element_t qet;
     priority_queue<qet, vector<qet>, greater<qet>> dfq;
@@ -58,6 +58,8 @@ void brandes_skone(const split_graph_t &G, int source,
     }
 
     vector<double> delta(G.N);
+
+    auto S_copy = S;
 
     while (!S.empty()) {
         int v = S.top();
@@ -99,10 +101,6 @@ void brandes_skone(const split_graph_t &G, int source,
                         double old = delta[va];
                         delta[va] += sigma / double(num_paths[fa]) *
                                      sk.pNPaths[p][f][v] * delta[fa];
-
-                        if (va == 19 && old != delta[va]) {
-                            int a = 5;
-                        }
                     }
                 }
             }
@@ -111,11 +109,16 @@ void brandes_skone(const split_graph_t &G, int source,
 
     for (int v = 0; v < G.N; ++v) {
         if (v != source) {
-            if (v == 19 && delta[v] != 0) {
-                int a = 5;
-            }
             bc[v] += delta[v];
         }
+    }
+
+    while(!S_copy.empty()) {
+        int u = S_copy.top();
+        dist[u] = -1;
+        num_paths[u] = 0;
+        popped[u] = 0;
+        S_copy.pop();
     }
 }
 
