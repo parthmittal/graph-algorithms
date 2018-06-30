@@ -45,6 +45,8 @@ runone() {
         echo "Test [$TI] FAILED, check $TEST, $PART, diffout"
         exit 1
     fi
+
+    rm temp
 }
 
 for ((i=1; i<=$TESTS; i++)); do

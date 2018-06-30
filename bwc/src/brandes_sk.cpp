@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <graph.hpp>
+#include <optparser.hpp>
 #include <skeleton_sdm.hpp>
 #include <split_graph.hpp>
 
@@ -143,7 +144,9 @@ std::vector<double> brandes_skall(const sk_graph_t &G) {
             }
 
             /******** CLEANUP BEGINS ***********/
-            cerr << i << ' ' << j << " done" << endl;
+            if (config.checkIncluded("verbose")) {
+                cerr << i << ' ' << j << " done" << endl;
+            }
 
             for (int v : G.part[j]) {
                 is_dest[v] = false;
@@ -153,7 +156,9 @@ std::vector<double> brandes_skall(const sk_graph_t &G) {
             split.active[i] = 0;
         }
 
-        cerr << i << " done" << endl;
+        if (config.checkIncluded("verbose")) {
+            cerr << i << " done" << endl;
+        }
     }
 
     return bc;
