@@ -19,4 +19,4 @@ target_link_libraries(pe2a testing)
 
 configure_file(multitest_our.sh multitest_our.sh COPYONLY)
 configure_file(multitest_erdos.sh multitest_erdos.sh COPYONLY)
-configure_file(onetest_our.sh onetest_our.sh COPYONLY)
+configure_file(onetest_all.sh onetest_all.sh COPYONLY)
