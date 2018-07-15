@@ -11,10 +11,16 @@
 
 namespace our {
 
-std::unique_ptr<rgraph_vinfo_t> bwc_our::get_node_info(int u) {
+std::unique_ptr<rgraph_vinfo_t> bwc_our::get_rnode_info(int u) {
     rgraph_vinfo_t info;
     sssp(u, Gr, info.inorder, info.dist, info.num_paths);
     return std::make_unique<rgraph_vinfo_t>(info);
+}
+
+std::unique_ptr<graph_vinfo_t> bwc_our::get_node_info(int u) {
+    graph_vinfo_t info;
+    bfs(u, G, info.inorder, info.dist, info.num_paths);
+    return std::make_unique<graph_vinfo_t>(info);
 }
 
 void bwc_our::sim_brandes1(int u, const rgraph_vinfo_t &Lrv,
@@ -224,6 +230,96 @@ void bwc_our::sim_brandes1(int u, const rgraph_vinfo_t &Lrv,
 #undef SET_DISTANCE
 }
 
+/* L and R are the two end-points of the ear joint
+ * NB: L, R are both in Gr, not G
+ *
+ * Plan:
+ * 1. L <- vertex corresp. to L in G, same for R
+ * 2. No need to do BFS, just retrieve info from graph_vinfo_t.
+ * 2. In the reverse phase, do some magic to also simulate Brandes
+ * for all the vertices in ear.
+ */
+void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
+                             const graph_vinfo_t &RI,
+                             const std::vector<int> &ear) {
+    using namespace std;
+
+    L = Gr.id[L];
+    R = Gr.id[R];
+
+    int sources[] = {L, R};
+
+    vector<int> p(G.N, -1);
+    vector<double> delta(G.N, 0);
+
+    int eid = two.ears_of[ear.front()];
+
+    /* case1: for each u not in current ear, compute
+     * sum_{s in current ear} sum_{t not in current ear, t != u} bwc at u due
+     * to pair s, t
+     */
+    for (int i = 0; i < 2; ++i) {
+        auto root = (i == 0) ? LI : RI;
+        auto other = (i == 0) ? RI : LI;
+
+        /* iterate on bfs-tree of root in non-increasing order of distance */
+        for (int v : root.inorder) {
+            if (two.ears_of[v] == eid) {
+                continue;
+                /* this node is part of the ear we're using as a source;
+                 * we deal with such vertices in a separate case
+                 */
+            }
+            int root_distance = root.dist[v];
+            int other_distance = other.dist[v];
+            int ear_size = ear.size();
+
+            /* we want to find largest x s.t.
+             * root_distance + x < (ear_size - x + 1) + other_distance
+             * => 2x < ear_size + 1 + other_distance - root_distance
+             * => x < (ear_size + 1 + other_distance - root_distance) / 2
+             * and, of course, x <= ear_size
+             */
+
+            int x2 = ear_size + 1 + other_distance - root_distance;
+            int x = x2 / 2 - (x2 % 2 == 0); /* x < x2 / 2 */
+            x = min(x, ear_size);
+
+            /* now test if (x + 1) leads to equality */
+
+            int eqn = 0;
+            if (x < ear_size) {
+                eqn =
+                    (x + 1 + root_distance == other_distance + (ear_size - x));
+                /* when you move to (x + 1), the distance from the other side
+                 * is other_distance + (ear_size - (x + 1) + 1) */
+            }
+
+            for (auto &u : G[v]) {
+                if (root.dist[u] + 1 == other.dist[v]) {
+                    delta[u] += root.num_paths[u] / double(root.num_paths[v]) *
+                                (x + delta[v]);
+                    /* we add (x + delta[v]) instead of (1 + delta[v]),
+                     * since we have x sources which contribute bwc with v
+                     * as sink
+                     */
+
+                    /* deal with situation with equal length path via root
+                     * and via other:
+                     * root.num_paths[u] paths go via root and u into v
+                     * root.num_paths[v] + other.num_paths[v] go from the
+                     * equal length source from either side. Note that
+                     * whenever eqn is non-zero, these paths are distinct.
+                     */
+                    delta[u] += root.num_paths[u] /
+                                double(root.num_paths[v] + other.num_paths[v]) *
+                                eqn;
+                }
+            }
+        }
+    }
+}
+
 void bwc_our::sim_brandes_all() {
     /* idea:
      * Do a BFS of the reduced graph (treating edges as unweighted).
@@ -253,7 +349,7 @@ void bwc_our::sim_brandes_all() {
             ++current_allocated;
             max_allocated = max(max_allocated, current_allocated);
         } else {
-            info[root] = get_node_info(root);
+            info[root] = get_rnode_info(root);
         }
 
         while (!bfq.empty()) {
@@ -272,7 +368,7 @@ void bwc_our::sim_brandes_all() {
                         max_allocated = max(max_allocated, current_allocated);
                     } else { /* not a dry run, so actually make the allocation
                               */
-                        info[v] = get_node_info(v);
+                        info[v] = get_rnode_info(v);
                     }
                 }
                 if (vis[v] == 1) {
@@ -311,7 +407,7 @@ void bwc_our::sim_brandes_all() {
                      */
                     brandes::bwc1(G, Gr.rid[root], bwc);
                 } else {
-                    info[root] = get_node_info(root);
+                    info[root] = get_rnode_info(root);
                     sim_brandes1(Gr.rid[root], *info[root], *info[root]);
                     info[root].reset();
                 }

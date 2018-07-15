@@ -18,6 +18,38 @@ struct queue_element_t {
 
 typedef long long ll;
 
+void bfs(int source, const graph_t<int> &G, std::vector<int> &S,
+        std::vector<int> &dist, std::vector<ll> &num_paths) {
+    using namespace std;
+
+    dist.resize(G.N, -1);
+    num_paths.resize(G.N, 0);
+
+    queue<int> bfq;
+
+    bfq.push(source);
+    dist[source] = 0; num_paths[source] = 1;
+
+    while(!bfq.empty()) {
+        int u = bfq.front();
+        bfq.pop();
+        S.push_back(u);
+
+        for (int v : G[u]) {
+            if (dist[v] == -1) {
+                dist[v] = dist[u] + 1;
+                bfq.push(v);
+            }
+
+            if (dist[v] == dist[u] + 1) {
+                num_paths[v] += num_paths[u];
+            }
+        }
+    }
+
+    reverse(S.begin(), S.end());
+}
+
 void sssp(int source, const reduced_graph_t &G, std::vector<int> &S,
           std::vector<int> &dist, std::vector<ll> &num_paths) {
     using namespace std;
