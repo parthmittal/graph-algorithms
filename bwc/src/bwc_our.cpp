@@ -251,6 +251,7 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
 
     vector<int> p(G.N, -1);
     vector<double> delta(G.N, 0);
+    vector<double> delta_eq(G.N, 0);
 
     int eid = two.ears_of[ear.front()];
 
@@ -296,7 +297,7 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
             }
 
             for (auto &u : G[v]) {
-                if (root.dist[u] + 1 == other.dist[v]) {
+                if (root.dist[u] + 1 == root.dist[v]) {
                     delta[u] += root.num_paths[u] / double(root.num_paths[v]) *
                                 (x + delta[v]);
                     /* we add (x + delta[v]) instead of (1 + delta[v]),
@@ -304,16 +305,53 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
                      * as sink
                      */
 
-                    /* deal with situation with equal length path via root
-                     * and via other:
-                     * root.num_paths[u] paths go via root and u into v
-                     * root.num_paths[v] + other.num_paths[v] go from the
-                     * equal length source from either side. Note that
-                     * whenever eqn is non-zero, these paths are distinct.
-                     */
-                    delta[u] += root.num_paths[u] /
+                    if (eqn != 0) {
+                        /* deal with situation with equal length path via root
+                         * and via other:
+                         * root.num_paths[u] paths go via root and u into v
+                         * root.num_paths[v] + other.num_paths[v] go from the
+                         * equal length source from either side. Note that
+                         * whenever eqn is non-zero, these paths are distinct.
+                         */
+
+                        /* let s = (x + 1)-th node on the ear from root towards
+                         * other;
+                         * we know that there exist shortest paths
+                         * s --- root --- v and s --- other --- v;
+                         * we want to know if there exist shortest paths
+                         * s --- root --- u and s --- other --- u.
+                         *
+                         * The situation looks something like:
+                         * root ----- s ----- other
+                         *    \               /
+                         *     \             /
+                         *      \           /
+                         *       \         /
+                         *        \       /
+                         *         \     /
+                         *         common
+                         *           |
+                         *           |
+                         *           |
+                         *           u
+                         *           |
+                         *           v
+                         * This changes the "propagation" of the betweenness
+                         * centrality.
+                         */
+                        if (root.dist[u] + x ==
+                            other.dist[u] + (ear_size - x)) {
+                            delta_eq[u] +=
+                                root.num_paths[u] /
                                 double(root.num_paths[v] + other.num_paths[v]) *
-                                eqn;
+                                (1 + delta_eq[v]);
+                        } else {
+                            delta[u] +=
+                                root.num_paths[u] /
+                                double(root.num_paths[v] + other.num_paths[v]) *
+                                (1 + delta_eq[v]);
+                        }
+                    }
                 }
             }
         }
