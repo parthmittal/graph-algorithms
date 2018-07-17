@@ -249,10 +249,6 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
 
     int sources[] = {L, R};
 
-    vector<int> p(G.N, -1);
-    vector<double> delta(G.N, 0);
-    vector<double> delta_eq(G.N, 0);
-
     int eid = two.ears_of[ear.front()];
 
     /* case1: for each u not in current ear, compute
@@ -262,6 +258,8 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
     for (int i = 0; i < 2; ++i) {
         auto root = (i == 0) ? LI : RI;
         auto other = (i == 0) ? RI : LI;
+        vector<double> delta(G.N, 0);
+        vector<double> delta_eq(G.N, 0);
 
         /* iterate on bfs-tree of root in non-increasing order of distance */
         for (int v : root.inorder) {
@@ -271,6 +269,7 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
                  * we deal with such vertices in a separate case
                  */
             }
+
             int root_distance = root.dist[v];
             int other_distance = other.dist[v];
             int ear_size = ear.size();
@@ -285,6 +284,7 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
             int x2 = ear_size + 1 + other_distance - root_distance;
             int x = x2 / 2 - (x2 % 2 == 0); /* x < x2 / 2 */
             x = min(x, ear_size);
+            x = max(x, 0);
 
             /* now test if (x + 1) leads to equality */
 
@@ -354,6 +354,69 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
                     }
                 }
             }
+
+            bwc[v] += delta[v] + delta_eq[v];
+        }
+    }
+
+    /* case2: Same as case1, but for each u __in__ current ear */
+    for (int i = 0; i < 2; ++i) {
+        auto root = (i == 0) ? LI : RI;
+        auto other = (i == 0) ? RI : LI;
+
+        int ear_size = ear.size();
+        vector<double> offset(ear_size + 1), update(ear_size + 1);
+
+        if (ear_size < 2) {
+            /* if the ear has only 1 vertex, then it does not contribute any
+             * betweenness centrality to itself */
+            continue;
+        }
+
+        for (int t = 0; t < G.N; ++t) {
+            if (two.ears_of[t] == eid) { /* t belongs to same ear */
+                continue;
+            }
+
+            /* as before, compute the "cut-point" x */
+            int root_distance = root.dist[t];
+            int other_distance = other.dist[t];
+
+            int x2 = ear_size + 1 + other_distance - root_distance;
+            int x = x2 / 2 - (x2 % 2 == 0); /* x < x2 / 2 */
+            x = min(x, ear_size);
+
+            /* with the first x vertices of the ear from root as source,
+             * each vertex before them gets a betweenness centrality of 1
+             * due to the sink t
+             */
+
+            if (x <= 1) {
+                continue;
+            }
+
+            offset[0] += x - 1; /* (x - 1) sources, one sink, all add +1 */
+            update[1] -= 1;     /* the number of sources decrease by 1 */
+            update[x + 1] += 1; /* once cross last of sources, stop decreasing
+                                   number of sources */
+        }
+
+        vector<double> delta(ear_size);
+        double diff = 0, val = 0;
+        for (int d = 0; d < ear_size; ++d) {
+            diff += update[d];
+            val += offset[d];
+            val += diff;
+
+            delta[d] += val;
+        }
+
+        if (i == 1) {
+            reverse(delta.begin(), delta.end());
+        }
+
+        for (int i = 0; i < ear_size; ++i) {
+            bwc[ear[i]] += delta[i];
         }
     }
 }
