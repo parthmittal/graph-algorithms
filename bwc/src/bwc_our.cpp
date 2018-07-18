@@ -419,6 +419,57 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
             bwc[ear[i]] += delta[i];
         }
     }
+
+    /* case3: sources, sinks inside ear; compute bwc at every vertex outside ear
+     */
+
+    for (int i = 0; i < 2; ++i) {
+        auto root = (i == 0) ? LI : RI;
+        auto other = (i == 0) ? RI : LI;
+
+        int LR = root.dist[(i == 0) ? R : L];
+        int ear_size = ear.size();
+
+        /* num_dom := number of pairs (s, t) such that all shortest paths from
+         * s to t hit root.
+         * num_eq := number of pairs (s, t) such that all but one shortest path
+         * from s to t hit root.
+         */
+        int num_dom = 0, num_eq = 0;
+
+        for (int s = 1; s <= ear_size; ++s) {
+            /* we want to find minimum x so that
+             * (x - s) > s + LR + (ear_size - x + 1)
+             * => 2x > 2s + LR + ear_size + 1
+             * => x > (2s + LR + ear_size + 1) / 2;
+             */
+
+            int x2 = 2 * s + LR + ear_size + 1;
+            int x = x2 / 2 + 1;
+
+            if (x > ear_size) {
+                continue;
+            }
+
+            num_dom += (ear_size - x + 1);
+
+            /* check if (x - 1) leads to tie */
+            if (x > s && (x - 1 - s) == (s + LR + (ear_size - (x - 1) + 1))) {
+                num_eq++;
+            }
+        }
+
+        long long sLR = root.num_paths[(i == 0) ? R : L];
+        for (int u = 0; u < G.N; ++u) {
+            if (two.ears_of[u] != eid) {
+                if (root.dist[u] + other.dist[u] == LR) {
+                    long long thru = root.num_paths[u] * other.num_paths[u];
+                    bwc[u] += num_dom * thru / double(sLR);
+                    bwc[u] += num_eq * thru / double(sLR + 1);
+                }
+            }
+        }
+    }
 }
 
 void bwc_our::sim_brandes_all() {
