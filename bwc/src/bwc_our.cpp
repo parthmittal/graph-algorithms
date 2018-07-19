@@ -249,7 +249,10 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
 
     int sources[] = {L, R};
 
-    int eid = two.ears_of[ear.front()];
+    vector<bool> in_joint(G.N);
+    for (auto &v : ear) {
+        in_joint[v] = true;
+    }
 
     /* case1: for each u not in current ear, compute
      * sum_{s in current ear} sum_{t not in current ear, t != u} bwc at u due
@@ -263,7 +266,7 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
 
         /* iterate on bfs-tree of root in non-increasing order of distance */
         for (int v : root.inorder) {
-            if (two.ears_of[v] == eid) {
+            if (in_joint[v]) {
                 continue;
                 /* this node is part of the ear we're using as a source;
                  * we deal with such vertices in a separate case
@@ -374,7 +377,7 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
         }
 
         for (int t = 0; t < G.N; ++t) {
-            if (two.ears_of[t] == eid) { /* t belongs to same ear */
+            if (in_joint[t]) { /* t belongs to same ear */
                 continue;
             }
 
@@ -415,8 +418,8 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
             reverse(delta.begin(), delta.end());
         }
 
-        for (int i = 0; i < ear_size; ++i) {
-            bwc[ear[i]] += delta[i];
+        for (int j = 0; j < ear_size; ++j) {
+            bwc[ear[j]] += delta[j];
         }
     }
 
@@ -447,27 +450,82 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
             int x2 = 2 * s + LR + ear_size + 1;
             int x = x2 / 2 + 1;
 
+            /* check if (x - 1) leads to tie */
+            if (x > s && (x - 1 - s) == (s + LR + (ear_size - (x - 1) + 1))) {
+                num_eq++;
+            }
+
             if (x > ear_size) {
                 continue;
             }
 
             num_dom += (ear_size - x + 1);
-
-            /* check if (x - 1) leads to tie */
-            if (x > s && (x - 1 - s) == (s + LR + (ear_size - (x - 1) + 1))) {
-                num_eq++;
-            }
         }
 
         long long sLR = root.num_paths[(i == 0) ? R : L];
         for (int u = 0; u < G.N; ++u) {
-            if (two.ears_of[u] != eid) {
+            if (!in_joint[u]) {
                 if (root.dist[u] + other.dist[u] == LR) {
                     long long thru = root.num_paths[u] * other.num_paths[u];
                     bwc[u] += num_dom * thru / double(sLR);
                     bwc[u] += num_eq * thru / double(sLR + 1);
                 }
             }
+        }
+    }
+
+    /* case 4: sources, sinks inside ear; compute bwc at every vertex inside ear
+     */
+
+    for (int i = 0; i < 2; ++i) {
+        auto root = (i == 0) ? LI : RI;
+        auto other = (i == 0) ? RI : LI;
+
+        int LR = root.dist[(i == 0) ? R : L];
+        int ear_size = ear.size();
+
+        vector<double> update(ear_size + 1), offset(ear_size + 1);
+        for (int s = 1; s <= ear_size; ++s) {
+            /* as before, find minimum x so that we will go through root
+             * to get to x from s */
+
+            int x2 = 2 * s + LR + ear_size + 1;
+            int x = x2 / 2 + 1;
+
+            /* (x + 1), (x + 2), ... ear_size get bwc 1 due to source s and
+             * sink x, (x + 2), ... ear_size get bwc 1 due to .. sink (x + 1)
+             * ...
+             * ear_size gets bwc 1 due to .. sink (ear_size - 1)
+             */
+            if (x < ear_size) {
+                update[x + 1] += 1;
+            }
+
+            long long sLR = root.num_paths[(i == 0) ? R : L];
+            /* check if (x - 1) leads to tie */
+            if (x > s && (x - 1 - s) == (s + LR + (ear_size - (x - 1) + 1))) {
+                /* there is only one "internal" path, and sLR paths which
+                 * go around */
+                offset[x] += sLR / double(1 + sLR);
+            }
+        }
+
+        vector<double> delta(ear_size);
+        double val = 0, run = 0;
+        for (int x = 1; x <= ear_size; ++x) {
+            run += update[x];
+            val += offset[x];
+
+            val += run;
+            delta[x - 1] = val;
+        }
+
+        if (i == 1) {
+            reverse(delta.begin(), delta.end());
+        }
+
+        for (int i = 0; i < ear_size; ++i) {
+            bwc[ear[i]] += delta[i];
         }
     }
 }
