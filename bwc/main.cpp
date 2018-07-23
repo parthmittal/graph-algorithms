@@ -27,6 +27,7 @@ int main(int argc, const char **argv) {
     config.addOption("-s", "--insig-dijkstra");
     config.addOption("-p", "--brandes-pp");
     config.addOption("-v", "--verbose");
+    config.addOption("-f", "--fast-interpolation");
     config.parse(argc, argv);
 
     auto graph_tmp = read_file(cin, config);

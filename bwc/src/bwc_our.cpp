@@ -541,6 +541,7 @@ void bwc_our::sim_brandes_all() {
     assert(config.checkIncluded("d") != -1);
 
     vector<unique_ptr<rgraph_vinfo_t>> info(Gr.N);
+    vector<unique_ptr<graph_vinfo_t>> finfo(Gr.N);
     vector<int> vis(Gr.N);
     vector<int> done(G.N);
 
@@ -559,7 +560,11 @@ void bwc_our::sim_brandes_all() {
             ++current_allocated;
             max_allocated = max(max_allocated, current_allocated);
         } else {
-            info[root] = get_rnode_info(root);
+            if (config.checkIncluded("f")) {
+                finfo[root] = get_node_info(root);
+            } else {
+                info[root] = get_rnode_info(root);
+            }
         }
 
         while (!bfq.empty()) {
@@ -578,16 +583,28 @@ void bwc_our::sim_brandes_all() {
                         max_allocated = max(max_allocated, current_allocated);
                     } else { /* not a dry run, so actually make the allocation
                               */
-                        info[v] = get_rnode_info(v);
+                        if (config.checkIncluded("f")) {
+                            finfo[v] = get_node_info(v);
+                        } else {
+                            info[v] = get_rnode_info(v);
+                        }
                     }
                 }
                 if (vis[v] == 1) {
                     if (!config.checkIncluded("d")) {
-                        for (auto &w : e.vids) {
-                            if (!done[w]) {
-                                done[w] = 1;
-                                sim_brandes1(w, *info[Gr.id[Gr.leftV[w]]],
-                                             *info[Gr.id[Gr.rightV[w]]]);
+                        if (config.checkIncluded("f")) {
+                            int w = e.vids.front();
+                            int L = Gr.id[Gr.leftV[w]];
+                            int R = u ^ v ^ L;
+
+                            sim_brandes_ej(L, R, *finfo[L], *finfo[R], e.vids);
+                        } else {
+                            for (auto &w : e.vids) {
+                                if (!done[w]) { /* is this check neccessary? */
+                                    done[w] = 1;
+                                    sim_brandes1(w, *info[Gr.id[Gr.leftV[w]]],
+                                                 *info[Gr.id[Gr.rightV[w]]]);
+                                }
                             }
                         }
                     }
@@ -598,7 +615,10 @@ void bwc_our::sim_brandes_all() {
             if (config.checkIncluded("d")) {
                 --current_allocated;
             } else {
-                if (!done[Gr.rid[u]]) {
+                if (config.checkIncluded("f")) {
+                    brandes::bwc1(G, Gr.rid[u], bwc);
+                    finfo[u].reset();
+                } else if (!done[Gr.rid[u]]) {
                     sim_brandes1(Gr.rid[u], *info[u], *info[u]);
                     info[u].reset(); /* calls destructor on *(info[u]) */
                 }
