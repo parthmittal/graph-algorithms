@@ -234,8 +234,7 @@ void bwc_our::sim_brandes1(int u, const rgraph_vinfo_t &Lrv,
  * NB: L, R are both in Gr, not G
  *
  * Plan:
- * 1. L <- vertex corresp. to L in G, same for R
- * 2. No need to do BFS, just retrieve info from graph_vinfo_t.
+ * 1. No need to do BFS, just retrieve info from graph_vinfo_t.
  * 2. In the reverse phase, do some magic to also simulate Brandes
  * for all the vertices in ear.
  */
@@ -243,9 +242,6 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
                              const graph_vinfo_t &RI,
                              const std::vector<int> &ear) {
     using namespace std;
-
-    L = Gr.id[L];
-    R = Gr.id[R];
 
     int sources[] = {L, R};
 
@@ -262,7 +258,6 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
         auto root = (i == 0) ? LI : RI;
         auto other = (i == 0) ? RI : LI;
         vector<double> delta(G.N, 0);
-        vector<double> delta_eq(G.N, 0);
 
         /* iterate on bfs-tree of root in non-increasing order of distance */
         for (int v : root.inorder) {
@@ -317,48 +312,14 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
                          * whenever eqn is non-zero, these paths are distinct.
                          */
 
-                        /* let s = (x + 1)-th node on the ear from root towards
-                         * other;
-                         * we know that there exist shortest paths
-                         * s --- root --- v and s --- other --- v;
-                         * we want to know if there exist shortest paths
-                         * s --- root --- u and s --- other --- u.
-                         *
-                         * The situation looks something like:
-                         * root ----- s ----- other
-                         *    \               /
-                         *     \             /
-                         *      \           /
-                         *       \         /
-                         *        \       /
-                         *         \     /
-                         *         common
-                         *           |
-                         *           |
-                         *           |
-                         *           u
-                         *           |
-                         *           v
-                         * This changes the "propagation" of the betweenness
-                         * centrality.
-                         */
-                        if (root.dist[u] + x ==
-                            other.dist[u] + (ear_size - x)) {
-                            delta_eq[u] +=
-                                root.num_paths[u] /
-                                double(root.num_paths[v] + other.num_paths[v]) *
-                                (1 + delta_eq[v]);
-                        } else {
-                            delta[u] +=
-                                root.num_paths[u] /
-                                double(root.num_paths[v] + other.num_paths[v]) *
-                                (1 + delta_eq[v]);
-                        }
+                        delta[u] +=
+                            root.num_paths[u] /
+                            double(root.num_paths[v] + other.num_paths[v]);
                     }
                 }
             }
 
-            bwc[v] += delta[v] + delta_eq[v];
+            bwc[v] += delta[v];
         }
     }
 
@@ -386,8 +347,28 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
             int other_distance = other.dist[t];
 
             int x2 = ear_size + 1 + other_distance - root_distance;
+            if (x2 < 0) {
+                continue;
+            }
+
             int x = x2 / 2 - (x2 % 2 == 0); /* x < x2 / 2 */
             x = min(x, ear_size);
+
+            /* check if (x + 1) leads to equality */
+            int eqn = 0;
+            if (x < ear_size) {
+                eqn =
+                    (x + 1 + root_distance == other_distance + (ear_size - x));
+                /* when you move to (x + 1), the distance from the other side
+                 * is other_distance + (ear_size - (x + 1) + 1) */
+
+                if (eqn) {
+                    double b = root.num_paths[t] /
+                               double(root.num_paths[t] + other.num_paths[t]);
+                    offset[1] += b;
+                    offset[x + 1] -= b;
+                }
+            }
 
             /* with the first x vertices of the ear from root as source,
              * each vertex before them gets a betweenness centrality of 1
@@ -398,7 +379,7 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
                 continue;
             }
 
-            offset[0] += x - 1; /* (x - 1) sources, one sink, all add +1 */
+            offset[1] += x;     /* (x - 1) sources, one sink, all add +1 */
             update[1] -= 1;     /* the number of sources decrease by 1 */
             update[x + 1] += 1; /* once cross last of sources, stop decreasing
                                    number of sources */
@@ -407,11 +388,11 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
         vector<double> delta(ear_size);
         double diff = 0, val = 0;
         for (int d = 0; d < ear_size; ++d) {
-            diff += update[d];
-            val += offset[d];
+            diff += update[d + 1];
+            val += offset[d + 1];
             val += diff;
 
-            delta[d] += val;
+            delta[d] = val;
         }
 
         if (i == 1) {
@@ -449,6 +430,10 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
 
             int x2 = 2 * s + LR + ear_size + 1;
             int x = x2 / 2 + 1;
+
+            if (x - 1 > ear_size) {
+                continue;
+            }
 
             /* check if (x - 1) leads to tie */
             if (x > s && (x - 1 - s) == (s + LR + (ear_size - (x - 1) + 1))) {
@@ -541,7 +526,7 @@ void bwc_our::sim_brandes_all() {
     assert(config.checkIncluded("d") != -1);
 
     vector<unique_ptr<rgraph_vinfo_t>> info(Gr.N);
-    vector<unique_ptr<graph_vinfo_t>> finfo(Gr.N);
+    vector<unique_ptr<graph_vinfo_t>> finfo(G.N);
     vector<int> vis(Gr.N);
     vector<int> done(G.N);
 
@@ -561,7 +546,7 @@ void bwc_our::sim_brandes_all() {
             max_allocated = max(max_allocated, current_allocated);
         } else {
             if (config.checkIncluded("f")) {
-                finfo[root] = get_node_info(root);
+                finfo[Gr.rid[root]] = get_node_info(Gr.rid[root]);
             } else {
                 info[root] = get_rnode_info(root);
             }
@@ -584,7 +569,7 @@ void bwc_our::sim_brandes_all() {
                     } else { /* not a dry run, so actually make the allocation
                               */
                         if (config.checkIncluded("f")) {
-                            finfo[v] = get_node_info(v);
+                            finfo[Gr.rid[v]] = get_node_info(Gr.rid[v]);
                         } else {
                             info[v] = get_rnode_info(v);
                         }
@@ -593,10 +578,8 @@ void bwc_our::sim_brandes_all() {
                 if (vis[v] == 1) {
                     if (!config.checkIncluded("d")) {
                         if (config.checkIncluded("f")) {
-                            int w = e.vids.front();
-                            int L = Gr.id[Gr.leftV[w]];
-                            int R = u ^ v ^ L;
-
+                            int L = Gr.rid[u];
+                            int R = Gr.rid[v];
                             sim_brandes_ej(L, R, *finfo[L], *finfo[R], e.vids);
                         } else {
                             for (auto &w : e.vids) {
@@ -617,7 +600,7 @@ void bwc_our::sim_brandes_all() {
             } else {
                 if (config.checkIncluded("f")) {
                     brandes::bwc1(G, Gr.rid[u], bwc);
-                    finfo[u].reset();
+                    finfo[Gr.rid[u]].reset();
                 } else if (!done[Gr.rid[u]]) {
                     sim_brandes1(Gr.rid[u], *info[u], *info[u]);
                     info[u].reset(); /* calls destructor on *(info[u]) */
@@ -643,6 +626,10 @@ void bwc_our::sim_brandes_all() {
                 }
             }
         }
+    }
+
+    for (int u = 0; u < G.N; ++u) {
+        finfo[u].reset();
     }
 
     if (config.checkIncluded("d")) {
