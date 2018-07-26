@@ -255,8 +255,8 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
      * to pair s, t
      */
     for (int i = 0; i < 2; ++i) {
-        auto root = (i == 0) ? LI : RI;
-        auto other = (i == 0) ? RI : LI;
+        const graph_vinfo_t & root = (i == 0) ? LI : RI;
+        const graph_vinfo_t & other = (i == 0) ? RI : LI;
         vector<double> delta(G.N, 0);
 
         /* iterate on bfs-tree of root in non-increasing order of distance */
@@ -408,8 +408,8 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
      */
 
     for (int i = 0; i < 2; ++i) {
-        auto root = (i == 0) ? LI : RI;
-        auto other = (i == 0) ? RI : LI;
+        auto & root = (i == 0) ? LI : RI;
+        auto & other = (i == 0) ? RI : LI;
 
         int LR = root.dist[(i == 0) ? R : L];
         int ear_size = ear.size();
@@ -463,8 +463,8 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
      */
 
     for (int i = 0; i < 2; ++i) {
-        auto root = (i == 0) ? LI : RI;
-        auto other = (i == 0) ? RI : LI;
+        auto & root = (i == 0) ? LI : RI;
+        auto & other = (i == 0) ? RI : LI;
 
         int LR = root.dist[(i == 0) ? R : L];
         int ear_size = ear.size();
