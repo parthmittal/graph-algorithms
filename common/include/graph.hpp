@@ -22,7 +22,7 @@ template <typename edge_t> struct naive_graph_t {
 
     naive_graph_t(const std::vector<std::vector<edge_t>> &adj,
                   std::vector<int> P)
-        : adj(adj), N(adj.size()), P(P) {}
+        : adj(adj), P(P), N(adj.size()) {}
 
     const std::vector<edge_t> &operator[](int u) const {
 #ifdef DEBUG

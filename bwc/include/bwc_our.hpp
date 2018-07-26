@@ -44,6 +44,6 @@ struct bwc_our {
 
     bwc_our(graph_t<int> &G) : G(G), two(G), Gr(G, two), bwc(G.N) {}
 };
-}; // namespace our
+} // namespace our
 
 #endif

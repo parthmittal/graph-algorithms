@@ -29,7 +29,7 @@ rgraph_hack_t::rgraph_hack_t(const graph_t<int> &G,
         /* increase the degree of the beginning and end of ear,
          * so even if their degree was only 2, they still become end-points
          * of edges in Gr */
-        int ear_start = ear.front().first, ear_end = ear.back().second;
+        int ear_start = ear.front().first;
 
         int weight = 1, u = ear_start;
         vector<int> active;

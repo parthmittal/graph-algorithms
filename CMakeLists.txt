@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 
 set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS "-Wall -pedantic")
+set(CMAKE_CXX_FLAGS "-Wall -Wno-sign-compare -pedantic -Werror")
 project(CentralityThings)
 
 add_subdirectory(bwc)

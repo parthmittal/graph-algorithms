@@ -23,4 +23,4 @@ std::vector<std::pair<int, int>> gnp(int N, double p) {
 
     return edges;
 }
-}; // namespace gen
+} // namespace gen

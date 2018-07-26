@@ -6,6 +6,6 @@
 
 namespace gen {
 std::vector<std::pair<int, int>> gnp(int N, double p);
-};
+}
 
 #endif

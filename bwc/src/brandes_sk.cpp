@@ -98,7 +98,6 @@ void brandes_skone(const split_graph_t &G, int source,
                 for (int f = 0; f < F; ++f) {
                     int fa = sk.rid[p][f];
                     if (dist[fa] == sk.pDist[p][f][v] + min_dist) {
-                        double old = delta[va];
                         delta[va] += sigma / double(num_paths[fa]) *
                                      sk.pNPaths[p][f][v] * delta[fa];
                     }

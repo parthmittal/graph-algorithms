@@ -8,7 +8,7 @@ namespace our {
 /* sorts by .second */
 std::vector<std::pair<int, int>>
 counting_sort(const std::vector<std::pair<int, int>> &inp);
-}; // namespace our
+} // namespace our
 
 #endif // __COUNT_SORT_hpp__
 
