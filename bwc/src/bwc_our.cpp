@@ -491,7 +491,9 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
             if (x > s && (x - 1 - s) == (s + LR + (ear_size - (x - 1) + 1))) {
                 /* there is only one "internal" path, and sLR paths which
                  * go around */
-                offset[x] += sLR / double(1 + sLR);
+                if (x <= ear_size) {
+                    offset[x] += sLR / double(1 + sLR);
+                }
             }
         }
 
@@ -511,6 +513,10 @@ void bwc_our::sim_brandes_ej(int L, int R, const graph_vinfo_t &LI,
 
         for (int i = 0; i < ear_size; ++i) {
             bwc[ear[i]] += delta[i];
+        }
+
+        if (L == 0 && R == 21816) {
+            int a = 42;
         }
     }
 }
