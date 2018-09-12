@@ -529,6 +529,21 @@ void bwc_our::sim_brandes_all() {
     vector<int> vis(Gr.N);
     vector<int> done(G.N);
 
+    if (config.checkIncluded("j")) {
+        /* just find dist. of ear-joint lengths */
+        map<int, int> cnt;
+        for (int i = 0; i < Gr.N; ++i) {
+            for (auto &e : Gr[i]) {
+                cnt[e.weight - 1] += 1;
+            }
+        }
+
+        for (auto &c : cnt) {
+            cout << c.first << ' ' << c.second << endl;
+        }
+        return;
+    }
+
     int max_allocated = 0;
     int current_allocated = 0;
     for (int root = 0; root < Gr.N; ++root) {

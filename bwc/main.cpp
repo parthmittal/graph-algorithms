@@ -28,6 +28,7 @@ int main(int argc, const char **argv) {
     config.addOption("-p", "--brandes-pp");
     config.addOption("-v", "--verbose");
     config.addOption("-f", "--fast-interpolation");
+    config.addOption("-j", "--joints-info");
     config.parse(argc, argv);
 
     auto graph_tmp = read_file(cin, config);
@@ -77,8 +78,12 @@ int main(int argc, const char **argv) {
         bc_wrapper.sim_brandes_all();
         finish = chrono::steady_clock::now();
 
-        for (int i = 0; i < graph.N; ++i) {
-            cout << bc_wrapper.bwc[i] << '\n';
+        if (config.checkIncluded("d") || config.checkIncluded("j")) {
+            /* don't print bwc, since we didn't actually compute it */
+        } else {
+            for (int i = 0; i < graph.N; ++i) {
+                cout << bc_wrapper.bwc[i] << '\n';
+            }
         }
     }
 
